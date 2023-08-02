@@ -1,0 +1,79 @@
+---
+title: "Untitled"
+author: "Ronaldlee Ejalu"
+date: "5/18/2021"
+output: html_document
+---
+
+# Package Installation scripts
+```{r}
+# library(rlang)
+# sessionInfo()
+
+#remove.packages("pkgload")
+#options("install.lock"=FALSE)
+install.packages("library(pkgload", dependencies = TRUE, INSTALL_opts = '--no-lock')
+```
+
+
+```{r}
+library(ggplot2)
+library(gifski)
+library(gganimate)
+
+library(gapminder)
+```
+
+
+```{r}
+head(gapminder)
+```
+
+# static plot
+```{r}
+p <- ggplot(
+  gapminder, 
+  aes(x = gdpPercap, y=lifeExp, size = pop, colour = country)
+  ) +
+  geom_point(show.legend = FALSE, alpha = 0.7) +
+  scale_color_viridis_d() +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() +
+  labs(x = "GDP per capita", y = "Life expectancy")
+
+```
+
+# Add a transition layer
+```{r}
+p <- p + transition_time(year) +
+  labs(title = "Year: {frame_time}") #+ shadow_mark(alpha = 0.3, size = 0.5)
+p
+```
+
+
+# Using plotly
+```{r}
+library(plotly)
+library(gapminder)
+p <- gapminder %>%
+  plot_ly(
+    x = ~gdpPercap, 
+    y = ~lifeExp, 
+    size = ~pop, 
+    color = ~continent, 
+    frame = ~year, 
+    text = ~country, 
+    hoverinfo = "text",
+    type = 'scatter',
+    mode = 'markers'
+  ) %>%
+  layout(
+    xaxis = list(
+      type = "log"
+    )
+  )
+p
+```
+
+
+#

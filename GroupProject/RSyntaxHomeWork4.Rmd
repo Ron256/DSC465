@@ -1,0 +1,49 @@
+---
+title: "HomeWork4"
+author: "Ronaldlee Ejalu"
+date: "5/19/2021"
+output: html_document
+---
+
+
+# Load the necessary libraries
+```{r}
+library(dplyr)
+library(tidyverse)
+
+library(ggplot2)
+library(RColorBrewer)
+library(scales) 
+library(gifski)
+library(gganimate)
+```
+
+# Set a working directory
+```{r}
+setwd("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork3")
+```
+
+# load the data set
+```{r}
+Flightsds <- read.csv(file = "../HomeWork3/datasets/2016.csv", sep = "," , header = TRUE )
+```
+
+# View the first 10 ten records
+```{r}
+head(Flightsds)
+```
+
+# determine any missing values
+```{r}
+sum(is.na(Flightsds))
+```
+
+# structure of the data set
+```{r}
+str(Flightsds)
+```
+
+# lets select a sample of 100000 rows
+```{r}
+flight.sampleds <- Flightsds[sample(nrow(Flightsds), 100000), ]
+```

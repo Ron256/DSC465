@@ -1,0 +1,23 @@
+---
+title: "RShiny Interactive World Maps"
+author: "Ronaldlee Ejalu"
+date: "5/19/2021"
+output: html_document
+---
+
+
+
+```{r}
+library(magrittr)
+library(rvest)
+url <- "https://www.nationsonline.org/oneworld/country_code_list.htm"
+iso_codes <- url %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="CountryCode"]') %>%
+  html_table()
+iso_codes <- iso_codes[[1]][, -1]
+iso_codes <- iso_codes[!apply(iso_codes, 1, function(x){all(x == x[1])}), ]
+names(iso_codes) <- c("Country", "ISO2", "ISO3", "UN")
+head(iso_codes)
+```
+
