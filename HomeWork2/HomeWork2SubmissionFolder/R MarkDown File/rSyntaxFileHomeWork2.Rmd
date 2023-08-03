@@ -1,0 +1,1094 @@
+---
+title: "rSyntaxFileHomeWork2"
+author: "Ronaldlee Ejalu"
+date: "4/19/2021"
+output:
+  word_document: default
+  html_document: default
+---
+
+# load the required packages
+```{r}
+library(ggplot2)
+library(maps)
+library(dplyr)
+```
+
+# set the working directory
+```{r}
+setwd("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork2")
+```
+
+# load the data set
+```{r}
+foodservices <- read.delim(file = "../HomeWork2/datasets/FoodSrvcByCounty.txt", 
+                           header = TRUE, 
+                           dec = ","
+)
+```
+
+# load the states data set
+```{r}
+statesabbr <- read.csv(file = "../HomeWork2/datasets/csvData.csv", 
+                       header = TRUE, 
+                       sep = ",", 
+                       dec = ".")
+```
+
+
+# rename the columns in statesabbr data set
+```{r}
+names(statesabbr)[1] <- "state"
+names(statesabbr)[2] <- "abbrev"
+names(statesabbr)[3] <- "code"
+```
+
+# remove missing values
+```{r}
+foodservices <- na.omit(foodservices)
+```
+
+# column names of food services
+```{r}
+str(foodservices)
+```
+
+
+
+# Transform the data into the lower case
+```{r}
+statesabbr1 <- statesabbr %>%
+  mutate(state = tolower(state), abbrev = tolower(abbrev), code = tolower(code))
+```
+
+# Returns string without leading or trailing white space
+```{r}
+trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+```
+
+
+# transform the county and state code into lower case
+```{r}
+foodservices <- foodservices %>% 
+  filter(State != "") %>%
+  mutate(County = tolower(County), 
+         State = tolower(State)
+  ) %>%
+  mutate(County = trim(County)
+         , State = trim(State)
+  )
+```
+
+# rename some column in the food services data set
+```{r}
+names(foodservices)[1] <- "county"
+names(foodservices)[2] <- "code"
+```
+
+
+# merge the statesabbr1 data set with food services data set 
+# to lookup the full name of the state
+```{r}
+foodservicesmergedStates <- merge(foodservices, 
+                                  statesabbr1, 
+                                  by.x = "code", 
+                                  by.y = "code", 
+                                  na.rm = TRUE
+                                  )
+```
+
+# Define arguments for reshaping data
+# using the build_longer_spec from the tidyr package
+# use pivot_longer_spec with spec data set to transform the data
+# by unpivoting
+```{r}
+library(tidyverse)
+foodservicesSpec <- foodservicesmergedStates %>%
+  tidyr::build_longer_spec(cols = starts_with("FoodServices.")
+                      , names_to = "foodservicesyears"
+                      , values_to = "foodservices"
+                      , names_prefix = "FoodServices"
+  )
+#foodservicesSpec
+
+usfoodservices <- pivot_longer_spec(foodservicesmergedStates, foodservicesSpec)
+```
+
+# transform foodservicesyears and foodservices
+```{r}
+usfoodservices <- usfoodservices %>% 
+  mutate(foodservicesyears = trim(str_replace(foodservicesyears,"."," ")
+                                  ), foodservices = as.numeric(foodservices)
+         )
+```
+
+# aggregate foodservices by states in the usfoodservices data set
+```{r}
+foodservices.agg <- usfoodservices %>% # read foodservices data set.
+#  mutate(state = as.factor(state)) %>%
+  dplyr::group_by(state) %>% # group the states together
+  summarise(avg.foodservices = mean(foodservices), .groups = 'drop') # find the mean 
+```
+
+# Convert the states values back to capital letters
+```{r}
+foodservices.agg <- foodservices.agg %>% 
+  mutate(state = toupper(state)) #%>%
+  #mutate(state = ifelse(state == '', 'DISTRICT OF COLUMBIA',))
+```
+
+
+
+##################################################################################
+#Understaing shape files
+################################################################################
+
+
+# load these pacakges
+```{r}
+library(leaflet)
+library(magrittr)
+library(rgdal)
+library(geojsonio)
+library(htmltools)
+library(htmlwidgets)
+library(stringi)
+library(RColorBrewer)
+```
+
+# read in the states files
+```{r}
+states_shp <- readOGR("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork2/States_shapefile-shp/States_shapefile.shp")
+```
+
+
+# determining if there is a match between join column names
+```{r}
+is.element(states_shp$State_Name, foodservices.agg$state)
+```
+
+# merge the shapefile with the data set
+```{r}
+states_merged_foodservices <- merge(states_shp, foodservices.agg, by.x = "State_Name", by.y = "state")
+```
+
+# generate a tool tip
+```{r}
+popup_states <- paste0("food services: ", as.character(states_merged_foodservices$avg.foodservices))
+```
+
+# create bins for the different totalfoodservices values
+```{r}
+bins <- c(0, 100, 200, 300, 400, 500, 600, Inf)
+palbin <- colorBin("Oranges", domain = states_merged_foodservices$avg.foodservices, bins = bins) #YlGnBu
+```
+
+
+# generate labels
+```{r}
+stateLabels <- sprintf('<b>%s</b><br/>%g food services',
+                       states_merged_foodservices$State_Name, states_merged_foodservices$avg.foodservices) %>%
+  lapply(function(x) HTML(x))
+
+states_merged_foodservices <- cbind(states_merged_foodservices, matrix(stateLabels, ncol = 1, dimnames = list(c(), c('stateLabels'))))
+```
+
+# This line of code NAs but it isn't working as expected
+# needs to be investigated.
+
+# ```{r}
+# # FUNCTION TO REMOVE NA's IN sp DataFrame OBJECT
+# #   x           sp spatial DataFrame object
+# #   margin      Remove rows (1) or columns (2) 
+# sp.na.omit <- function(x, margin=1) {
+#   if (!inherits(x, "SpatialPointsDataFrame") & !inherits(x, "SpatialPolygonsDataFrame")) 
+#     stop("MUST BE sp SpatialPointsDataFrame OR SpatialPolygonsDataFrame CLASS OBJECT") 
+#   na.index <- unique(as.data.frame(which(is.na(x@data),arr.ind=TRUE))[,margin])
+#     if(margin == 1) {  
+#       cat("DELETING ROWS: ", na.index, "\n") 
+#         return( x[-na.index,]  ) 
+#     }
+#     if(margin == 2) {  
+#       cat("DELETING COLUMNS: ", na.index, "\n") 
+#         return( x[,-na.index]  ) 
+#     }
+#  }
+# ```
+# 
+# # delete NA's in Crash.map
+# ```{r}
+# states_merged_foodservices.noNAs <- sp.na.omit(states_merged_foodservices)
+# ```
+# 
+# # Show changes in the dim
+# ```{r}
+# dim(states_merged_foodservices)
+# dim(states_merged_foodservices.noNAs)
+# ```
+
+
+# graph the map
+```{r}
+
+m <- leaflet(states_merged_foodservices) %>% 
+  
+  addProviderTiles(providers$CartoDB.PositronNoLabels) %>%
+  setView(lng = -96.25, lat = 39.50, zoom = 4) %>%
+  addPolygons(color = "grey", 
+              weight = 0.2, 
+              smoothFactor = 0.2, 
+              fillOpacity = 0.7, 
+              fillColor =  ~palbin(states_merged_foodservices$avg.foodservices), 
+              popup = ~popup_states, label = ~stateLabels, 
+              labelOptions = labelOptions(
+                style = list(color = 'gray30'),
+                textsize = '10px'),
+              highlightOptions = highlightOptions(
+                weight = 3,
+                color = 'dodgerblue' # change this color
+                )
+              ) %>%
+  addLegend(pal = palbin, values = states_merged_foodservices$avg.foodservices, position = "bottomright", title = "Average Food<br/>Services<br/> per<br/>U.S States")
+m
+```
+
+#Strategies to removing missing values
+```{r}
+states_merged_foodservices@data %>% slice(9)
+```
+
+
+##########################################################################################################################################################
+# food services by county
+#########################################################################################################################################################
+
+# load the us counties shape file
+```{r}
+us_counties.shp <- readOGR("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork2/cb_2019_us_county_500k/cb_2019_us_county_500k.shp")
+```
+
+# Convert the first letter of every value in the county variable to Uppercase
+```{r}
+usfoodservices <- usfoodservices %>%
+  mutate(county = str_to_title(county))
+```
+
+# Remove Alaska(2), Hawaii(15), Puerto Rico (72), Guam (66), Virgin Islands (78), American Samoa (60)
+#  Mariana Islands (69), Micronesia (64), Marshall Islands (68), Palau (70), Minor Islands (74)
+```{r}
+us_counties.shp <- us_counties.shp[!us_counties.shp$STATEFP %in% c("02", "15", 
+                                                                   "72", "66", 
+                                                                   "78", "60", 
+                                                                   "69","64", 
+                                                                   "68", "70", 
+                                                                   "74"),]
+```
+
+## Make sure other outling islands are removed.
+```{r}
+us_counties.shp <- us_counties.shp[!us_counties.shp$STATEFP %in% c("81", "84", 
+                                                                   "86", "87", 
+                                                                   "89", "71", 
+                                                                   "76", "95", "79"),]
+```
+
+
+#determining if there is a match between join column names of different data sets
+```{r}
+is.element(us_counties.shp$NAME, usfoodservices$county)
+```
+
+# aggregate foodservices by us_counties
+```{r}
+usfoodservicesbycounties.agg <- usfoodservices %>% # read foodservices data set.
+  dplyr::group_by(county) %>% # group the states together
+  summarise(avg.foodservices = mean(foodservices), 
+            .groups = 'drop'
+            ) # find the mean or the average
+```
+
+# Merge the us_counties.shp with the usfoodservicesbycounties data set
+```{r}
+us_counties.shp_merged_datafile <- merge(us_counties.shp, usfoodservicesbycounties.agg, by.x = "NAME", by.y = "county", rm.na = TRUE)
+```
+
+# Map colors to continous values
+```{r}
+#paletteNum <- colorNumeric("YlOrRd", domain = us_counties.shp_merged_datafile$totalfoodservices)
+#paletteNum <- colorNumeric("Oranges", NULL, n= 20) #domain = us_counties.shp_merged_datafile$totalfoodservices)
+bins <- c(0, 100, 200, 300, 400, 500, 600, Inf)
+paletteNum <- colorBin("Oranges", domain = states_merged_foodservices$avg.foodservices, bins = bins) #YlGnBu
+```
+
+
+
+# Format popup data for leaflet map.
+```{r}
+popup_dat <- paste0("<strong>County: </strong>", 
+                    us_counties.shp_merged_datafile$NAME, 
+                    "<br><strong>Value: </strong>", 
+                    us_counties.shp_merged_datafile$avg.foodservices)
+```
+
+# create county labels
+```{r}
+countyLabels <- sprintf('County: <b>%s</b><br/>%g food services',
+                       us_counties.shp_merged_datafile$NAME, us_counties.shp_merged_datafile$avg.foodservices) %>%
+  lapply(function(x) HTML(x))
+
+states_merged_foodservices <- cbind(us_counties.shp_merged_datafile, matrix(countyLabels, ncol = 1, dimnames = list(c(), c('countyLabels'))))
+```
+
+
+# This line of code NAs but it isn't working as expected
+# needs to be investigated.
+```{r}
+ # FUNCTION TO REMOVE NA's IN sp DataFrame OBJECT
+ #   x           sp spatial DataFrame object
+ #   margin      Remove rows (1) or columns (2)
+ sp.na.omit <- function(x, margin=1) {
+   if (!inherits(x, "SpatialPointsDataFrame") & !inherits(x, "SpatialPolygonsDataFrame"))
+     stop("MUST BE sp SpatialPointsDataFrame OR SpatialPolygonsDataFrame CLASS OBJECT")
+   na.index <- unique(as.data.frame(which(is.na(x@data),arr.ind=TRUE))[,margin])
+     if(margin == 1) {
+      cat("DELETING ROWS: ", na.index, "\n")
+         return( x[-na.index,]  )
+     }
+     if(margin == 2) {
+       cat("DELETING COLUMNS: ", na.index, "\n")
+         return( x[,-na.index]  )
+     }
+  }
+```
+ # delete NA's in Crash.map
+
+```{r}
+ states_merged_foodservices.noNAs <- sp.na.omit(states_merged_foodservices)
+```
+
+
+
+
+ # Show changes in the dim
+ ```{r}
+ dim(states_merged_foodservices)
+ dim(states_merged_foodservices.noNAs)
+ ```
+
+
+
+# Graph the us counties map
+```{r}
+m <- leaflet() %>%
+  addProviderTiles(providers$CartoDB.PositronNoLabels) %>%
+  setView(lng = -96.25, lat = 39.50, zoom = 4) %>%
+  addPolygons(data =  states_merged_foodservices.noNAs, 
+              weight = 0.2, 
+              smoothFactor = 0.5, 
+              fillOpacity = 0.7, 
+              fillColor =  ~paletteNum( states_merged_foodservices.noNAs$avg.foodservices), 
+              popup = ~popup_dat, label = ~countyLabels, 
+              labelOptions = labelOptions(
+                style = list(color = 'gray30'),
+                textsize = '10px'),
+              highlightOptions = highlightOptions(
+                weight = 3,
+                color = '#2c7fb8' # change this color dodgerblue
+                )
+              )%>%
+  addLegend(pal = paletteNum, values =  states_merged_foodservices.noNAs$avg.foodservices, position = "bottomright", title = "Average Food<br/>Services<br/> per<br/>U.S Counties")
+m
+```
+
+
+######################################################################################################################
+#Question 2 Part a 
+######################################################################################################################
+
+
+
+# set to the working directory
+```{r}
+setwd("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork2")
+```
+
+
+# basic example - default layers
+```{r}
+m <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lat=41.878930, lng= -87.625940, popup="DePaul CDM")
+m  # Print the map
+```
+
+# read shape file from :
+#https://gis.chicagopolice.org/datasets/police-beat-boundary-view-1?geometry=-93.859%2C41.124%2C-82.121%2C42.556
+# do not use the KML files - they do not seem to be correctly formatted and will not keep 
+# the attributes we need
+# this reads the boundaries of each beat as a list of points making up a polygon
+```{r}
+myShape4 <- readOGR("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork2/Police_Beat_Boundary_View-shp")
+myShape4@data$BEAT_NUMBE # show list of beats (still factor here)
+myShape4@polygons[[1]] # show first shape in file
+```
+
+# note that 'BEAT_NUMBER' name gets truncated
+# change the factor to int to match the crashes file
+# could also tell readOGR to not read strings as factors
+```{r}
+myShape4@data$BEAT_OF_OCCURRENCE = as.integer(as.character(myShape4@data$BEAT_NUMBE))
+```
+
+# read the crashes file - which includes 'beat of occurrence' which is the 
+# key used to join to the BEAT in the shape file
+
+```{r}
+crashes <- read.csv("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork2/datasets/chicago_crashes.csv")
+```
+
+#aggregate the total fatalities by beat in the crashes data set.
+```{r}
+
+crashes.agg <- crashes %>% # read crashes
+  mutate(INJURIES_TOTAL = ifelse( is.na(INJURIES_TOTAL), 0, INJURIES_TOTAL)) %>% #change NA to 0
+    dplyr::group_by(BEAT_OF_OCCURRENCE) %>% #group the beats together
+    summarise(total = sum(INJURIES_TOTAL), .groups = 'drop') # sum up to a total
+```
+
+#this merge will add these attributes to your spatial data frame - it should be aggregated to
+#the same level - i.e. 1 row per shape or less (see above)
+
+```{r}
+crash.map <- merge(myShape4, crashes.agg, 
+                   by.x  = "BEAT_OF_OCCURRENCE", by.y="BEAT_OF_OCCURRENCE")
+```
+
+#see the attributes in the spacial data set
+```{r}
+crash.map@data$total
+```
+
+
+#create full leaflet map with color by total fatalities
+#create palette - this gives you back a function that will later take in an integer
+# and return an RGB color from a precalculated range given by the domain passed in
+# I do a unique() just to reduce the # going in but it will also work with the full list
+```{r}
+pal <- colorNumeric(
+  palette = "#2b8cbe",
+  domain = unique(crash.map@data$total)) 
+```
+
+# create bins for the different total injuries
+```{r}
+bins <- c(0, 5, 10, 15,  Inf)
+palbin <- colorBin("PuBu", domain = crash.map$total, bins = bins)
+```
+
+#generate Beat Occurence label
+```{r}
+beatLabels <- sprintf('<b>Beat Occurrence: %s</b><br/>Injuries total: %g',
+                       crash.map$BEAT_OF_OCCURRENCE, crash.map$total) %>%
+  lapply(function(x) HTML(x))
+
+states_merged_foodservices <- cbind(crash.map, matrix(beatLabels, ncol = 1, dimnames = list(c(), c('beatLabels'))))
+```
+
+# generate a tool tip
+```{r}
+popup_chicago <- paste0("Injuries total: ", as.character(crash.map$total))
+```
+
+
+
+# create map with continous colors for total fatalities for whole data set
+# this includes the default leaflet layer
+```{r}
+m <- leaflet(crash.map) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(weight = 1, smoothFactor = 0.5,
+              #color = ~pal(total),    
+              opacity = 1.0, 
+              fillOpacity = 0.7, 
+              fillColor = ~palbin(crash.map$total), 
+              popup = ~popup_chicago, 
+              label = beatLabels, 
+              labelOptions = labelOptions(style = list(color = 'gray30')
+                                            , textsize = '10px'
+                                            ), 
+              highlightOptions = highlightOptions(weight = 3, 
+                                                    color = '#feb24c'
+                                                    )
+              ) %>%
+  addLegend(pal = pal, values = crash.map$total, position = "bottomright", title = "Total Injuries per<br/>Beat of Occurrence")
+m  # Print the map
+```
+
+
+##############################################################################################################
+# 2b
+##################################################################################################################
+
+# load library
+```{r}
+library(tidyverse)
+```
+
+
+# create 4 bins of width 6
+
+```{r}
+crash.withbins <- crashes %>%
+  mutate(bin = cut(CRASH_HOUR, seq(min(CRASH_HOUR), max(CRASH_HOUR) + 4, 6 ), right = FALSE))
+```
+
+# extract beat of occurrences that occurred between 12am and 6am 
+
+```{r}
+crashes.agg.12amto6am <- crash.withbins %>% 
+  filter(bin == '[0,6)') %>%
+ mutate(INJURIES_TOTAL = ifelse( is.na(INJURIES_TOTAL), 0, INJURIES_TOTAL)) %>% #change NA to 0
+    dplyr::group_by(BEAT_OF_OCCURRENCE) %>% #group the beats together
+    summarise(total = sum(INJURIES_TOTAL), .groups = 'drop') # sum up to a total
+```
+
+# this merge will add these attributes to your spatial data frame - it should be aggregated to
+# the same level - i.e. 1 row per shape or less (see above)
+
+```{r}
+crash.map <- merge(myShape4, crashes.agg.12amto6am, 
+                   by.x  = "BEAT_OF_OCCURRENCE", by.y="BEAT_OF_OCCURRENCE")
+```
+
+
+#create full leaflet map with color by total fatalities
+#create palette - this gives you back a function that will later take in an integer
+# and return an RGB color from a precalculated range given by the domain passed in
+# I do a unique() just to reduce the # going in but it will also work with the full list
+```{r}
+pal <- colorNumeric(
+  palette = "#2b8cbe",
+  domain = unique(crash.map@data$total)) 
+```
+
+# create bins for the different total injuries
+```{r}
+bins <- c(0, 5, 10, 15,  Inf)
+palbin <- colorBin("PuBu", domain = crash.map$total, bins = bins)
+```
+
+#generate Beat Occurence label
+```{r}
+beatLabels <- sprintf('<b>Beat Occurrence: %s</b><br/>Injuries total: %g',
+                       crash.map$BEAT_OF_OCCURRENCE, crash.map$total) %>%
+  lapply(function(x) HTML(x))
+
+states_merged_foodservices <- cbind(crash.map, matrix(beatLabels, ncol = 1, dimnames = list(c(), c('beatLabels'))))
+```
+
+# generate a tool tip
+```{r}
+popup_chicago <- paste0("Injuries total: ", as.character(crash.map$total))
+```
+
+# Display NA rows in the crash.map 
+```{r}
+crash.map@data[!complete.cases(crash.map@data),]
+```
+
+```{r}
+# FUNCTION TO REMOVE NA's IN sp DataFrame OBJECT
+#   x           sp spatial DataFrame object
+#   margin      Remove rows (1) or columns (2) 
+sp.na.omit <- function(x, margin=1) {
+  if (!inherits(x, "SpatialPointsDataFrame") & !inherits(x, "SpatialPolygonsDataFrame")) 
+    stop("MUST BE sp SpatialPointsDataFrame OR SpatialPolygonsDataFrame CLASS OBJECT") 
+  na.index <- unique(as.data.frame(which(is.na(x@data),arr.ind=TRUE))[,margin])
+    if(margin == 1) {  
+      cat("DELETING ROWS: ", na.index, "\n") 
+        return( x[-na.index,]  ) 
+    }
+    if(margin == 2) {  
+      cat("DELETING COLUMNS: ", na.index, "\n") 
+        return( x[,-na.index]  ) 
+    }
+ }
+```
+
+# delete NA's in Crash.map
+```{r}
+crash.mapwithoutNAs <- sp.na.omit(crash.map)
+```
+
+# Show changes in the dim
+```{r}
+dim(crash.map)
+dim(crash.mapwithoutNAs)
+```
+
+
+# create map with continous colors for total fatalities for whole data set
+# this includes the default leaflet layer
+```{r}
+m <- leaflet(crash.mapwithoutNAs) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  #setView(lng = -87.6298, lat = 47.8781, zoom = 4) %>%
+  addPolygons(weight = 1, smoothFactor = 0.5,
+              opacity = 1.0, 
+              fillOpacity = 0.7, 
+              fillColor = ~palbin(crash.mapwithoutNAs$total), 
+              popup = ~popup_chicago, 
+              label = beatLabels, 
+              labelOptions = labelOptions(style = list(color = 'gray30')
+                                            , textsize = '10px'
+                                            ), 
+              highlightOptions = highlightOptions(weight = 3, 
+                                                    color = '#feb24c'
+                                                    )
+              ) %>%
+  addLegend(pal = palbin, values = crash.mapwithoutNAs$total, position = "bottomright", title = " 12am to 6am<br/>Total Injuries per<br/> Beat of Occurrence", opacity = 1)
+m  # Print the map
+```
+
+########################################################
+# 6 am to 12 pm
+##########################################################
+
+
+# extract beat of occurrences that occurred between 6am and 12pm 
+# and sum up Injuries total and group the beats together
+
+```{r}
+crashes.agg.6amto12pm <- crash.withbins %>% 
+  filter(bin == '[6,12)') %>%
+ mutate(INJURIES_TOTAL = ifelse( is.na(INJURIES_TOTAL), 0, INJURIES_TOTAL)) %>% #change NA to 0
+    dplyr::group_by(BEAT_OF_OCCURRENCE) %>% #group the beats together
+    summarise(total = sum(INJURIES_TOTAL), .groups = 'drop') # sum up to a total
+```
+
+# this merge will add these attributes to your spatial data frame - it should be aggregated to
+# the same level - i.e. 1 row per shape or less (see above)
+
+```{r}
+crash.map <- merge(myShape4, crashes.agg.6amto12pm, 
+                   by.x  = "BEAT_OF_OCCURRENCE", by.y="BEAT_OF_OCCURRENCE")
+```
+
+
+#create full leaflet map with color by total fatalities
+#create palette - this gives you back a function that will later take in an integer
+# and return an RGB color from a precalculated range given by the domain passed in
+# I do a unique() just to reduce the # going in but it will also work with the full list
+```{r}
+pal <- colorNumeric(
+  palette = "#2b8cbe",
+  domain = unique(crash.map@data$total)) 
+```
+
+# create bins for the different total injuries
+```{r}
+bins <- c(0, 5, 10, 15,  Inf) #  RdYlGn, 2PuBuGn
+palbin <- colorBin("PuBu", domain = crash.map$total, bins = bins)
+```
+
+#generate Beat Occurence label
+```{r}
+beatLabels <- sprintf('<b>Beat Occurrence: %s</b><br/>Injuries total: %g',
+                       crash.map$BEAT_OF_OCCURRENCE, crash.map$total) %>%
+  lapply(function(x) HTML(x))
+
+states_merged_foodservices <- cbind(crash.map, matrix(beatLabels, ncol = 1, dimnames = list(c(), c('beatLabels'))))
+```
+
+# generate a tool tip
+```{r}
+popup_chicago <- paste0("Injuries total: ", as.character(crash.map$total))
+```
+
+
+# Display NA rows in the crash.map 
+```{r}
+crash.map@data[!complete.cases(crash.map@data),]
+```
+
+```{r}
+# FUNCTION TO REMOVE NA's IN sp DataFrame OBJECT
+#   x           sp spatial DataFrame object
+#   margin      Remove rows (1) or columns (2) 
+sp.na.omit <- function(x, margin=1) {
+  if (!inherits(x, "SpatialPointsDataFrame") & !inherits(x, "SpatialPolygonsDataFrame")) 
+    stop("MUST BE sp SpatialPointsDataFrame OR SpatialPolygonsDataFrame CLASS OBJECT") 
+  na.index <- unique(as.data.frame(which(is.na(x@data),arr.ind=TRUE))[,margin])
+    if(margin == 1) {  
+      cat("DELETING ROWS: ", na.index, "\n") 
+        return( x[-na.index,]  ) 
+    }
+    if(margin == 2) {  
+      cat("DELETING COLUMNS: ", na.index, "\n") 
+        return( x[,-na.index]  ) 
+    }
+ }
+```
+
+# delete NA's in Crash.map
+```{r}
+crash.mapwithoutNAs <- sp.na.omit(crash.map)
+```
+
+# Show changes in the dim
+```{r}
+dim(crash.map)
+dim(crash.mapwithoutNAs)
+```
+
+
+# create map with continous colors for total fatalities for whole data set
+# this includes the default leaflet layer
+```{r}
+m <- leaflet(crash.mapwithoutNAs) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(weight = 1, smoothFactor = 0.5,
+              #color = ~pal(total),    
+              opacity = 1.0, 
+              fillOpacity = 0.7, 
+              fillColor = ~palbin(crash.mapwithoutNAs$total), 
+              popup = ~popup_chicago, 
+              label = beatLabels, 
+              labelOptions = labelOptions(style = list(color = 'gray30')
+                                            , textsize = '10px'
+                                            ), 
+              highlightOptions = highlightOptions(weight = 3, 
+                                                    color = '#feb24c'
+                                                    )
+              ) %>%
+  addLegend(pal = palbin, values = crash.mapwithoutNAs$total, position = "bottomright", title = "6am to 12pm<br/>Total Injuries per<br/> Beat of Occurrence", opacity = 1)
+m  # Print the map
+```
+
+
+################################################################################################################################
+#12pm to 18pm
+################################################################################################################################
+
+
+# extract beat of occurrences that occurred between 6am and 12pm 
+# and sum up Injuries total and group the beats together
+
+```{r}
+crashes.agg.12pmto18pm <- crash.withbins %>% 
+  filter(bin == '[12,18)') %>%
+ mutate(INJURIES_TOTAL = ifelse( is.na(INJURIES_TOTAL), 0, INJURIES_TOTAL)) %>% #change NA to 0
+    dplyr::group_by(BEAT_OF_OCCURRENCE) %>% #group the beats together
+    summarise(total = sum(INJURIES_TOTAL), .groups = 'drop') # sum up to a total
+```
+
+# this merge will add these attributes to your spatial data frame - it should be aggregated to
+# the same level - i.e. 1 row per shape or less (see above)
+
+```{r}
+crash.map <- merge(myShape4, crashes.agg.12pmto18pm, 
+                   by.x  = "BEAT_OF_OCCURRENCE", by.y="BEAT_OF_OCCURRENCE")
+```
+
+
+#create full leaflet map with color by total fatalities
+#create palette - this gives you back a function that will later take in an integer
+# and return an RGB color from a precalculated range given by the domain passed in
+# I do a unique() just to reduce the # going in but it will also work with the full list
+```{r}
+pal <- colorNumeric(
+  palette = "#2b8cbe",
+  domain = unique(crash.map@data$total)) 
+```
+
+
+# create bins for the different total injuries
+```{r}
+bins <- c(0, 5, 10, 15,  Inf) #  Option colors 10 RdYlGn, 2) PuBuGn
+palbin <- colorBin("PuBu", domain = crash.map$total, bins = bins)
+```
+
+#generate Beat Occurence label
+```{r}
+beatLabels <- sprintf('<b>Beat Occurrence: %s</b><br/>Injuries total: %g',
+                       crash.map$BEAT_OF_OCCURRENCE, crash.map$total) %>%
+  lapply(function(x) HTML(x))
+
+states_merged_foodservices <- cbind(crash.map, matrix(beatLabels, ncol = 1, dimnames = list(c(), c('beatLabels'))))
+```
+
+# generate a tool tip
+```{r}
+popup_chicago <- paste0("Injuries total: ", as.character(crash.map$total))
+```
+
+
+
+# create map with continous colors for total fatalities for whole data set
+# this includes the default leaflet layer
+```{r}
+m <- leaflet(crash.map) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(weight = 1, smoothFactor = 0.5,
+              #color = ~pal(total),    
+              opacity = 1.0, 
+              fillOpacity = 0.7, 
+              fillColor = ~palbin(crash.map$total), 
+              popup = ~popup_chicago, 
+              label = beatLabels, 
+              labelOptions = labelOptions(style = list(color = 'gray30')
+                                            , textsize = '10px'
+                                            ), 
+              highlightOptions = highlightOptions(weight = 3, 
+                                                    color = '#feb24c'
+                                                    )
+              ) %>%
+  addLegend(pal = palbin, values = crash.map$total, position = "bottomright", title = "12pm to 6pm<br/>Total Injuries per<br/> Beat of Occurrence", opacity = 1)
+m  # Print the map
+```
+
+###########################################################################################################################
+#18pm to 24
+############################################################################################################################
+
+
+# extract beat of occurrences that occurred between 6am and 12pm 
+# and sum up Injuries total and group the beats together
+
+```{r}
+crashes.agg.18pmto24 <- crash.withbins %>% 
+  filter(bin == '[18,24)') %>%
+ mutate(INJURIES_TOTAL = ifelse( is.na(INJURIES_TOTAL), 0, INJURIES_TOTAL)) %>% #change NA to 0
+    dplyr::group_by(BEAT_OF_OCCURRENCE) %>% #group the beats together
+    summarise(total = sum(INJURIES_TOTAL), .groups = 'drop') # sum up to a total
+```
+
+# this merge will add these attributes to your spatial data frame - it should be aggregated to
+# the same level - i.e. 1 row per shape or less (see above)
+
+```{r}
+crash.map <- merge(myShape4, crashes.agg.18pmto24, 
+                   by.x  = "BEAT_OF_OCCURRENCE", by.y="BEAT_OF_OCCURRENCE")
+```
+
+
+
+#create full leaflet map with color by total fatalities
+#create palette - this gives you back a function that will later take in an integer
+# and return an RGB color from a precalculated range given by the domain passed in
+# I do a unique() just to reduce the # going in but it will also work with the full list
+```{r}
+pal <- colorNumeric(
+  palette = "#2b8cbe",
+  domain = unique(crash.map@data$total)) 
+```
+
+# create bins for the different total injuries
+```{r}
+bins <- c(0, 5, 10, 15,  Inf) #  Option colors 10 RdYlGn, 2) PuBuGn
+palbin <- colorBin("PuBu", domain = crash.map$total, bins = bins)
+```
+
+#generate Beat Occurence label
+```{r}
+beatLabels <- sprintf('<b>Beat Occurrence: %s</b><br/>Injuries total: %g',
+                       crash.map$BEAT_OF_OCCURRENCE, crash.map$total) %>%
+  lapply(function(x) HTML(x))
+
+states_merged_foodservices <- cbind(crash.map, matrix(beatLabels, ncol = 1, dimnames = list(c(), c('beatLabels'))))
+```
+
+# generate a tool tip
+```{r}
+popup_chicago <- paste0("Injuries total: ", as.character(crash.map$total))
+```
+
+
+# Display NA rows in the crash.map 
+```{r}
+crash.map@data[!complete.cases(crash.map@data),]
+```
+
+```{r}
+# FUNCTION TO REMOVE NA's IN sp DataFrame OBJECT
+#   x           sp spatial DataFrame object
+#   margin      Remove rows (1) or columns (2) 
+sp.na.omit <- function(x, margin=1) {
+  if (!inherits(x, "SpatialPointsDataFrame") & !inherits(x, "SpatialPolygonsDataFrame")) 
+    stop("MUST BE sp SpatialPointsDataFrame OR SpatialPolygonsDataFrame CLASS OBJECT") 
+  na.index <- unique(as.data.frame(which(is.na(x@data),arr.ind=TRUE))[,margin])
+    if(margin == 1) {  
+      cat("DELETING ROWS: ", na.index, "\n") 
+        return( x[-na.index,]  ) 
+    }
+    if(margin == 2) {  
+      cat("DELETING COLUMNS: ", na.index, "\n") 
+        return( x[,-na.index]  ) 
+    }
+ }
+```
+
+# delete NA's in Crash.map
+```{r}
+crash.mapwithoutNAs <- sp.na.omit(crash.map)
+```
+
+# Show changes in the dim
+```{r}
+dim(crash.map)
+dim(crash.mapwithoutNAs)
+```
+
+
+# create map with continous colors for total fatalities for whole data set
+# this includes the default leaflet layer
+```{r}
+m <- leaflet(crash.mapwithoutNAs) %>%
+  #drop_na() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(weight = 1, smoothFactor = 0.5,
+              #color = ~pal(total),    
+              opacity = 1.0, 
+              fillOpacity = 0.7, 
+              fillColor = ~palbin(crash.mapwithoutNAs$total), 
+              popup = ~popup_chicago, 
+              label = beatLabels, 
+              labelOptions = labelOptions(style = list(color = 'gray30')
+                                            , textsize = '10px'
+                                            ), 
+              highlightOptions = highlightOptions(weight = 3, 
+                                                    color = '#feb24c'
+                                                    )
+              ) %>%
+  addLegend(pal = palbin, values = crash.mapwithoutNAs$total, position = "bottomright", title = "6pm to midnight<br/>Total Injuries per<br/> Beat of Occurrence", opacity = 1)
+m  # Print the map
+```
+
+
+#######################################################################################################################################
+# 3a Simple moving average
+#######################################################################################################################################
+
+# set the working directory
+```{r}
+setwd("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork2")
+```
+
+# load the data set
+```{r}
+PortlandWaterLevel2003 <- read.csv(file = "../HomeWork2/datasets/PortlandWaterLevel2003.csv", 
+                           header = TRUE, 
+                           sep = ","
+)
+```
+
+# structure of the data set
+```{r}
+str(PortlandWaterLevel2003)
+```
+
+# Converting the date field to date
+# in the format of the 1st month of every year
+```{r}
+library(lubridate)
+PortlandWaterLevel2003 <- PortlandWaterLevel2003 %>%
+  mutate(Date = mdy(Date)
+         )
+```
+
+
+
+
+# generate the plot
+```{r}
+library(tidyquant)
+wlplot <-  ggplot(PortlandWaterLevel2003, aes(x= Date, y = WL)) +
+  #geom_line() 
+ expand_limits(y=0) # Make the y-axis go to zero.
+wlplot <- wlplot + geom_ma(ma_fun = SMA, n = 100, size = 1, color = "black")
+wlplot <- wlplot + theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=10
+                                   ),
+        
+        axis.text.y = element_text(face="bold.italic", 
+                                   size = 10
+                                   ), 
+        panel.grid.major.x = element_blank(), # Hide the vertical grid lines 
+        panel.grid.minor.x = element_blank(),
+        
+        # panel.grid.major.y = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.y = element_blank(), 
+        legend.position = "none", 
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+  labs(y  = "Water Level", x = "Date", title = "Moving Average of Portland Water Levels for the year 2003") +
+  scale_x_date(breaks = "3 months") 
+  
+wlplot
+```
+
+#########################################################################################################
+#Area Curve
+#########################################################################################################
+
+# Extract out the hours of the Time variable
+```{r}
+library(stringi)
+PortlandWaterLevel2003 <- PortlandWaterLevel2003 %>%
+  mutate(HrsOfWaterLevels = substring(PortlandWaterLevel2003$Time, 
+                                      0, 
+                                      unlist(gregexpr(pattern = ":", 
+                                                      PortlandWaterLevel2003$Time
+                                                      )
+                                             ) - 1
+                                      )  %>% as.numeric()
+         )
+```
+
+
+# create 4 bins of 6 hrs difference
+
+```{r}
+PortlandWaterLevel2003 <- PortlandWaterLevel2003 %>%
+  mutate(RangeOfHours = cut(HrsOfWaterLevels, seq(min(HrsOfWaterLevels), max(HrsOfWaterLevels) + 4, 6 ), right = FALSE))
+```
+
+# Group the Date and RangeOfHours together
+# and find the average
+```{r}
+PortlandWaterLevel2003.agg <- PortlandWaterLevel2003 %>%
+  dplyr::group_by(Date, RangeOfHours) %>%
+  summarise(avgWL = mean(WL), .groups = 'drop')
+```
+
+# derive the graph
+```{r}
+areamap <- ggplot(PortlandWaterLevel2003.agg, aes(x = Date, y = avgWL, fill = RangeOfHours)) +
+  expand_limits(y = 0) + 
+  geom_area() + 
+  scale_fill_viridis_d() + 
+  theme_light() + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=10
+                                   ),
+        
+        axis.text.y = element_text(face="bold.italic", 
+                                   size = 10
+                                   ), 
+        panel.grid.major.x = element_blank(), # Hide the vertical grid lines 
+        panel.grid.minor.x = element_blank()
+        , plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+  labs(y  = "% Average Water Level", x = "Date", title = "Cycles of water levels that happen every day per the Hour Range") +
+  scale_x_date(breaks = "3 months") 
+ 
+
+areamap
+```
+
