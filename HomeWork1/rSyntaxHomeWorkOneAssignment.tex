@@ -1,0 +1,916 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={DSC 465 HomeWork1 Assignment},
+  pdfauthor={Ronaldlee Ejalu},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\title{DSC 465 HomeWork1 Assignment}
+\author{Ronaldlee Ejalu}
+\date{4/1/2021}
+
+\begin{document}
+\maketitle
+
+\#load the necessary packages
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#library(plyr) # for data wrangling}
+\KeywordTok{library}\NormalTok{(dplyr)     }\CommentTok{# for data wrangling}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'dplyr' was built under R version 4.0.5
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(lubridate) }\CommentTok{# for dealing with dates}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'lubridate' was built under R version 4.0.3
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'lubridate'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     date, intersect, setdiff, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(ggplot2)   }\CommentTok{# for dealing with visualization}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'ggplot2' was built under R version 4.0.3
+\end{verbatim}
+
+\#set the working directory
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{setwd}\NormalTok{(}\StringTok{"C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\#Load the Intel Stock data set
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{intelstock <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\DataTypeTok{file =} \StringTok{"../HomeWork1/datasets/Intel-1998.csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{","}\NormalTok{ , }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+\#view the first 6 records of the data set
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(intelstock)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       Date Trading.Day  Open  High   Low Close   Volume Adj.Close
+## 1 1/2/1998           1 70.69 72.62 70.50 72.62 40927200     16.94
+## 2 1/5/1998           4 73.06 75.14 72.00 74.50 78368400     17.37
+## 3 1/6/1998           5 73.87 74.31 72.69 73.12 48313600     17.05
+## 4 1/7/1998           6 72.75 73.62 71.56 72.75 55380800     16.97
+## 5 1/8/1998           7 72.25 74.81 72.12 74.31 75730400     17.33
+## 6 1/9/1998           8 74.56 75.00 71.23 71.87 88028800     16.76
+\end{verbatim}
+
+\#Find any missing values
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sum}\NormalTok{(}\KeywordTok{is.na}\NormalTok{(intelstock))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\#derive weekday
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{intelstockds <-}\StringTok{ }\NormalTok{intelstock }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(}\DataTypeTok{date =}\NormalTok{ Date, }
+         \DataTypeTok{trainingday =}\NormalTok{ Trading.Day, }
+         \DataTypeTok{open =}\NormalTok{ Open, }
+         \DataTypeTok{high =}\NormalTok{ High, }
+         \DataTypeTok{low =}\NormalTok{ Low, }
+         \DataTypeTok{close =}\NormalTok{ Close, }
+         \DataTypeTok{volume =}\NormalTok{ Volume, }
+         \DataTypeTok{adjclose =}\NormalTok{ Adj.Close, }\DataTypeTok{date1 =}\NormalTok{ Date,}
+\NormalTok{         ) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{transmute}\NormalTok{(}\DataTypeTok{date =} \KeywordTok{mdy}\NormalTok{(date), }
+            \DataTypeTok{date1 =}\NormalTok{ date1,}
+            \DataTypeTok{trainingday =}\NormalTok{ trainingday, }
+            \DataTypeTok{open=}\NormalTok{open, }
+            \DataTypeTok{high=}\NormalTok{high, }
+            \DataTypeTok{low=}\NormalTok{low, }
+            \DataTypeTok{close=}\NormalTok{close, }
+            \DataTypeTok{volume=}\NormalTok{volume, }
+            \DataTypeTok{adjclose=}\NormalTok{adjclose,}
+            \DataTypeTok{range =}\NormalTok{ (high }\OperatorTok{-}\StringTok{ }\NormalTok{low)}
+\NormalTok{            ) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{wday =} \KeywordTok{wday}\NormalTok{(date, }\DataTypeTok{label =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{abbr =} \OtherTok{TRUE}\NormalTok{), }\DataTypeTok{date1 =} \KeywordTok{as.Date}\NormalTok{(date)}
+                                          
+\NormalTok{         )}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{an-ordinary-line-graph-of-closing-price-vs-date}{%
+\section{An ordinary line graph of closing price vs
+date}\label{an-ordinary-line-graph-of-closing-price-vs-date}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ intelstockds, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ date, }\DataTypeTok{y =}\NormalTok{ close)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{size =} \FloatTok{1.5}\NormalTok{, }\DataTypeTok{alpha =} \FloatTok{.6}\NormalTok{, }\DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\FloatTok{0.2}\NormalTok{)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{, }\KeywordTok{max}\NormalTok{(intelstockds}\OperatorTok{$}\NormalTok{close)) }\OperatorTok{+}\StringTok{ }\CommentTok{# have the y range start from zero. }
+\StringTok{  }\KeywordTok{annotate}\NormalTok{(}\StringTok{"text"}\NormalTok{, }
+           \DataTypeTok{x =} \KeywordTok{mean}\NormalTok{(}\KeywordTok{range}\NormalTok{(intelstockds}\OperatorTok{$}\NormalTok{date)), }
+           \DataTypeTok{y =} \OtherTok{Inf}\NormalTok{, }
+           \DataTypeTok{label =} \StringTok{"closing price vs date"}\NormalTok{, }
+           \DataTypeTok{vjust =} \FloatTok{1.5}\NormalTok{, }
+           \DataTypeTok{size =} \FloatTok{4.5}\NormalTok{, }
+           \DataTypeTok{colour =} \StringTok{"red"}
+\NormalTok{           )}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\#Bar graph of Volume Vs the exact Date
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#specify breaks as a Date vector}
+\NormalTok{datebreaks <-}\StringTok{ }\KeywordTok{seq}\NormalTok{(}\KeywordTok{as.Date}\NormalTok{(}\StringTok{"1998-01-01"}\NormalTok{), }\KeywordTok{as.Date}\NormalTok{(}\StringTok{"1999-01-01"}\NormalTok{), }\DataTypeTok{by =} \StringTok{"1 month"}\NormalTok{)}
+\NormalTok{p <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(intelstockds, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ date, }\DataTypeTok{y =}\NormalTok{ volume)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_col}\NormalTok{(}\DataTypeTok{width =} \FloatTok{0.5}\NormalTok{, }\DataTypeTok{position =} \StringTok{"dodge"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"Volume vs date"}\NormalTok{)}
+
+\NormalTok{p <-}\StringTok{ }\NormalTok{p }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_x_date}\NormalTok{(}\DataTypeTok{breaks =}\NormalTok{ datebreaks) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{scale_y_continuous}\NormalTok{(}\DataTypeTok{labels =}\NormalTok{ scales}\OperatorTok{::}\NormalTok{comma) }\OperatorTok{+}\StringTok{ }\CommentTok{# format the y axis and include , in the volume values}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{, }
+                                          \DataTypeTok{color=}\StringTok{"#993333"}
+                                          \CommentTok{#,  size=14}
+\NormalTok{                                          , }\DataTypeTok{angle=}\DecValTok{90}\NormalTok{)}
+\NormalTok{               , }\DataTypeTok{axis.text.y =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{,}
+                                             \DataTypeTok{color=}\StringTok{"#993333"}
+                                            \CommentTok{#, size=14}
+\NormalTok{                                            , }\DataTypeTok{angle=}\DecValTok{45}\NormalTok{)}
+\NormalTok{               ) }
+
+\NormalTok{p  }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\hypertarget{normalize-the-volume}{%
+\section{normalize the volume}\label{normalize-the-volume}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(scales)}
+\NormalTok{intelstockds <-}\StringTok{ }\NormalTok{intelstockds }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{norm.volume =} \KeywordTok{scale}\NormalTok{(volume))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{structure-of-intelstockds}{%
+\section{structure of intelstockds}\label{structure-of-intelstockds}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{str}\NormalTok{(intelstockds)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    252 obs. of  12 variables:
+##  $ date       : Date, format: "1998-01-02" "1998-01-05" ...
+##  $ date1      : Date, format: "1998-01-02" "1998-01-05" ...
+##  $ trainingday: int  1 4 5 6 7 8 11 12 13 14 ...
+##  $ open       : num  70.7 73.1 73.9 72.8 72.2 ...
+##  $ high       : num  72.6 75.1 74.3 73.6 74.8 ...
+##  $ low        : num  70.5 72 72.7 71.6 72.1 ...
+##  $ close      : num  72.6 74.5 73.1 72.8 74.3 ...
+##  $ volume     : int  40927200 78368400 48313600 55380800 75730400 88028800 123747600 97348000 123962000 53458400 ...
+##  $ adjclose   : num  16.9 17.4 17.1 17 17.3 ...
+##  $ range      : num  2.12 3.14 1.62 2.06 2.69 ...
+##  $ wday       : Ord.factor w/ 7 levels "Sun"<"Mon"<"Tue"<..: 6 2 3 4 5 6 2 3 4 5 ...
+##  $ norm.volume: num [1:252, 1] -0.89 0.301 -0.655 -0.431 0.217 ...
+##   ..- attr(*, "scaled:center")= num 68917848
+##   ..- attr(*, "scaled:scale")= num 31444442
+\end{verbatim}
+
+\hypertarget{summary-statistics-of-norm.volume}{%
+\section{summary statistics of
+norm.volume}\label{summary-statistics-of-norm.volume}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(intelstockds}\OperatorTok{$}\NormalTok{norm.volume)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        V1         
+##  Min.   :-1.6422  
+##  1st Qu.:-0.5989  
+##  Median :-0.1882  
+##  Mean   : 0.0000  
+##  3rd Qu.: 0.3017  
+##  Max.   : 9.5538
+\end{verbatim}
+
+\hypertarget{determine-the-bin-width}{%
+\section{determine the bin width}\label{determine-the-bin-width}}
+
+\hypertarget{using-the-formula-2-iqrcube-root-of-n}{%
+\section{using the formula 2 * IQR/cube root of
+n}\label{using-the-formula-2-iqrcube-root-of-n}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Q3 = 0.3017  }
+\CommentTok{# Q1 = -0.5989}
+\CommentTok{# IQR = Q3 - Q1}
+\CommentTok{# bin width  = 2 * IQR/cube root of n}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{number-of-observations}{%
+\section{number of observations}\label{number-of-observations}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dim}\NormalTok{(intelstockds)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 252  12
+\end{verbatim}
+
+Filt
+
+\#Creating a histogram of the daily stock Volume
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(intelstockds, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{volume)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins =} \DecValTok{20}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"Histogram of daily stock volume"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{labels =}\NormalTok{ scales}\OperatorTok{::}\NormalTok{comma)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-14-1.pdf}
+
+\hypertarget{remove-entries-with-the-means-greater-than-150086000}{%
+\section{Remove entries with the means greater than
+150086000}\label{remove-entries-with-the-means-greater-than-150086000}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{intelstockds.sortedf  <-}\StringTok{ }\NormalTok{intelstockds }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(volume }\OperatorTok{<=}\StringTok{ }\DecValTok{151875200}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\#Repeat or corrections for 1C
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(intelstockds.sortedf, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\KeywordTok{log}\NormalTok{(volume))) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins =}\NormalTok{ (}\KeywordTok{log2}\NormalTok{(}\DecValTok{252}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{expand_limits}\NormalTok{(}\DataTypeTok{y=}\DecValTok{0}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold.italic"}\NormalTok{, }
+                                   
+                                   \DataTypeTok{size=}\DecValTok{10}
+\NormalTok{                                   ), }
+        \DataTypeTok{axis.text.y =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold.italic"}\NormalTok{, }
+                                   
+                                   \DataTypeTok{size=}\DecValTok{10}
+\NormalTok{                                    )}
+\NormalTok{        ,}
+        \DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust =} \FloatTok{0.5}\NormalTok{, }
+                                  \DataTypeTok{size =} \DecValTok{14}\NormalTok{, }
+                                  \DataTypeTok{face =} \StringTok{"bold.italic"}
+\NormalTok{                                  ) }\CommentTok{# format the title}
+         
+\NormalTok{        )  }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"natural log of volume"}\NormalTok{, }\DataTypeTok{title =} \StringTok{"Histogram of daily stock volume"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-16-1.pdf}
+
+\hypertarget{scatter-plot-that-graphs-the-volume-on-the-x-axis-and}{%
+\section{Scatter plot that graphs the Volume on the x-axis
+and}\label{scatter-plot-that-graphs-the-volume-on-the-x-axis-and}}
+
+\hypertarget{the-daily-price-on-the-y-axis.}{%
+\section{the daily price on the
+y-axis.}\label{the-daily-price-on-the-y-axis.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(intelstockds, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ volume, }\DataTypeTok{y =}\NormalTok{ range)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{size =} \FloatTok{1.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\CommentTok{# using the size aesthetic to control the size of the points.}
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"Scatter plot of daily price range vs Volume "}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{labels =}\NormalTok{ scales}\OperatorTok{::}\NormalTok{comma) }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+\#Question 2
+\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#
+
+\#Load the data set
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{perceptionExperiment <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\DataTypeTok{file =} \StringTok{"../HomeWork1/datasets/PerceptionExperiment1.csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{","}\NormalTok{ , }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+\#View the first 6 rows
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(perceptionExperiment)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                         Test Display TestNumber Trial Subject Response
+## 1 Veritcal Distance, Aligned       1          1     B       1     0.60
+## 2 Veritcal Distance, Aligned       1          1     B       2     0.55
+## 3 Veritcal Distance, Aligned       1          1     B       3     0.70
+## 4 Veritcal Distance, Aligned       1          1     B       4     0.60
+## 5 Veritcal Distance, Aligned       1          1     B       5     0.65
+## 6 Veritcal Distance, Aligned       1          1     B       6     0.60
+##   TrueValue
+## 1       0.6
+## 2       0.6
+## 3       0.6
+## 4       0.6
+## 5       0.6
+## 6       0.6
+\end{verbatim}
+
+\#derive a new column that contains the amount of error.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{perceptionExperiment <-}\StringTok{ }\NormalTok{perceptionExperiment }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{error =}\NormalTok{ Response }\OperatorTok{-}\StringTok{ }\NormalTok{TrueValue, }
+         \DataTypeTok{absoluteError =} \KeywordTok{abs}\NormalTok{(Response }\OperatorTok{-}\StringTok{ }\NormalTok{TrueValue), }\DataTypeTok{Test =} \KeywordTok{as.factor}\NormalTok{(Test)}
+\NormalTok{         )}
+\end{Highlighting}
+\end{Shaded}
+
+\#a histogram of the overall distribution of Error
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(perceptionExperiment, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{error)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_histogram}\NormalTok{(}\DataTypeTok{bins =} \DecValTok{20}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"Histogram of the overall distribution error"}\NormalTok{) }\CommentTok{#+}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-21-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+  \CommentTok{#scale_x_continuous(labels = scales::comma)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{to-be-discussed-in-class.}{%
+\section{To be discussed in class.}\label{to-be-discussed-in-class.}}
+
+\hypertarget{a-bar-graph-of-the-median-error-by-test}{%
+\section{a bar graph of the median Error by
+Test}\label{a-bar-graph-of-the-median-error-by-test}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching packages --------------------------------------- tidyverse 1.3.0 --
+\end{verbatim}
+
+\begin{verbatim}
+## v tibble  3.1.1     v purrr   0.3.4
+## v tidyr   1.1.2     v stringr 1.4.0
+## v readr   1.4.0     v forcats 0.5.1
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'tibble' was built under R version 4.0.5
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'readr' was built under R version 4.0.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'stringr' was built under R version 4.0.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'forcats' was built under R version 4.0.3
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x lubridate::as.difftime() masks base::as.difftime()
+## x readr::col_factor()      masks scales::col_factor()
+## x lubridate::date()        masks base::date()
+## x purrr::discard()         masks scales::discard()
+## x dplyr::filter()          masks stats::filter()
+## x lubridate::intersect()   masks base::intersect()
+## x dplyr::lag()             masks stats::lag()
+## x lubridate::setdiff()     masks base::setdiff()
+## x lubridate::union()       masks base::union()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{(perceptionExperiment, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{fct_reorder}\NormalTok{(Test, error), }\DataTypeTok{y =}\NormalTok{ error)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_col}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{, }
+                                          \DataTypeTok{color=}\StringTok{"#993333"}
+\NormalTok{                                          ,  }\DataTypeTok{size=}\DecValTok{10}
+\NormalTok{                                          , }\DataTypeTok{angle=}\DecValTok{90}
+\NormalTok{                                   ), }
+        \DataTypeTok{axis.text.y =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold"}\NormalTok{, }
+                                   \DataTypeTok{color=}\StringTok{"#993333"}
+\NormalTok{                                   )}
+\NormalTok{  ) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"A bar graph of median error by Test"}\NormalTok{, }\DataTypeTok{x =} \StringTok{"Test"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{coord_flip}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-22-1.pdf}
+
+\#Repeat of 2b \# a bar graph of the median Error by Test
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\NormalTok{p <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(perceptionExperiment, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\KeywordTok{fct_reorder}\NormalTok{(Test, }\KeywordTok{desc}\NormalTok{(error)), }\DataTypeTok{y=}\NormalTok{error, }\DataTypeTok{fill=}\NormalTok{Test))}
+\NormalTok{p <-}\StringTok{ }\NormalTok{p }\OperatorTok{+}\StringTok{ }\KeywordTok{stat_summary}\NormalTok{(}\DataTypeTok{fun.y=}\StringTok{"median"}\NormalTok{, }\DataTypeTok{geom=}\StringTok{"bar"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_grey}\NormalTok{(}\DataTypeTok{base_size =} \DecValTok{14}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: `fun.y` is deprecated. Use `fun` instead.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p <-}\StringTok{ }\NormalTok{p }\OperatorTok{+}\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold"} 
+\NormalTok{                                           ,  }\DataTypeTok{size=}\DecValTok{10}
+\NormalTok{                                           , }\DataTypeTok{angle=}\DecValTok{90}
+\NormalTok{                                   ),}
+        \DataTypeTok{axis.text.y =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold"}
+\NormalTok{                                   ),}
+        \DataTypeTok{panel.grid.major.x =} \KeywordTok{element_blank}\NormalTok{(), }\CommentTok{# Hide the vertical grid lines }
+        \DataTypeTok{panel.grid.minor.x =} \KeywordTok{element_blank}\NormalTok{(),}
+        
+        \DataTypeTok{panel.grid.major.y =} \KeywordTok{element_blank}\NormalTok{(), }\CommentTok{# Hide the horizontal grid lines}
+        \DataTypeTok{panel.grid.minor.y =} \KeywordTok{element_blank}\NormalTok{(), }
+        
+        \CommentTok{# Change the background color (fill) and border (colour)}
+        \CommentTok{# and border thickness (size)of the legend box}
+        \CommentTok{# We control the title text color, font size and font face}
+        
+        \DataTypeTok{legend.background =} \KeywordTok{element_rect}\NormalTok{(}\DataTypeTok{fill =} \StringTok{"white"}\NormalTok{, }\DataTypeTok{colour =} \StringTok{"grey"}\NormalTok{, }\DataTypeTok{size =} \DecValTok{1}\NormalTok{), }
+        \DataTypeTok{legend.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{colour =} \StringTok{"blue"}\NormalTok{, }\DataTypeTok{face =} \StringTok{"bold"}\NormalTok{, }\DataTypeTok{size =} \DecValTok{14}\NormalTok{),}
+        \DataTypeTok{legend.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{colour =} \StringTok{"black"}\NormalTok{), }
+        \DataTypeTok{legend.key =} \KeywordTok{element_rect}\NormalTok{(}\DataTypeTok{colour =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{size =} \FloatTok{0.1}\NormalTok{)}
+\NormalTok{  ) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"A bar graph of median error by Test"}\NormalTok{, }\DataTypeTok{x =} \StringTok{"Test"}\NormalTok{)}
+\NormalTok{p <-}\StringTok{ }\NormalTok{p }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_discrete}\NormalTok{(}\DataTypeTok{limits =} \KeywordTok{c}\NormalTok{(}\StringTok{"Slope"}\NormalTok{, }\StringTok{"Volume"}\NormalTok{, }\StringTok{"Area"}\NormalTok{,  }\CommentTok{# controlling the order of the legend}
+                                   \StringTok{"Veritcal Distance, Aligned"}\NormalTok{, }
+                                   \StringTok{"Vertical Distance, Non-Aligned"}\NormalTok{, }
+                                   \StringTok{"Angle"}\NormalTok{, }\StringTok{"Length, Non-Aligned"}\NormalTok{, }\StringTok{"Color Value"}\NormalTok{)) }
+\NormalTok{p }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_y_continuous}\NormalTok{(}\DataTypeTok{breaks =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{-0.1}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{coord_flip}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-23-1.pdf}
+
+\#get variables of interest to derive the standard deviation
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{perceptionExperimentsdErrorbyTestdf <-}\StringTok{ }\NormalTok{perceptionExperiment }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(}\DataTypeTok{Test =}\NormalTok{ Test, }
+         \CommentTok{#TestNumber = TestNumber,  }
+         \DataTypeTok{error =}\NormalTok{ error}
+\NormalTok{         )}
+\end{Highlighting}
+\end{Shaded}
+
+\#Function to calculate the mean and the standard deviation for each
+group
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data_summary <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, varname, groupnames)\{}
+  \KeywordTok{require}\NormalTok{(plyr)}
+\NormalTok{  summary_func <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, col)\{}
+    \KeywordTok{c}\NormalTok{(}\DataTypeTok{mean =} \KeywordTok{mean}\NormalTok{(x[[col]], }\DataTypeTok{na.rm=}\OtherTok{TRUE}\NormalTok{),}
+      \DataTypeTok{sd =} \KeywordTok{sd}\NormalTok{(x[[col]], }\DataTypeTok{na.rm=}\OtherTok{TRUE}\NormalTok{))}
+\NormalTok{  \}}
+\NormalTok{  data_sum<-}\KeywordTok{ddply}\NormalTok{(data, groupnames, }\DataTypeTok{.fun=}\NormalTok{summary_func,}
+\NormalTok{                  varname)}
+\NormalTok{  data_sum <-}\StringTok{ }\KeywordTok{rename}\NormalTok{(data_sum, }\KeywordTok{c}\NormalTok{(}\StringTok{"mean"}\NormalTok{ =}\StringTok{ }\NormalTok{varname))}
+ \KeywordTok{return}\NormalTok{(data_sum)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\#Summarize the data set
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{perceptiondf <-}\StringTok{ }\KeywordTok{data_summary}\NormalTok{(perceptionExperimentsdErrorbyTestdf, }
+                             \DataTypeTok{varname =} \StringTok{"error"}\NormalTok{, }
+                             \DataTypeTok{groupnames =} \KeywordTok{c}\NormalTok{(}\StringTok{"Test"}\NormalTok{)}
+\NormalTok{                             )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: plyr
+\end{verbatim}
+
+\begin{verbatim}
+## ------------------------------------------------------------------------------
+\end{verbatim}
+
+\begin{verbatim}
+## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)
+\end{verbatim}
+
+\begin{verbatim}
+## ------------------------------------------------------------------------------
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'plyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:purrr':
+## 
+##     compact
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:dplyr':
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{perceptiondf}\OperatorTok{$}\NormalTok{Test <-}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(perceptiondf}\OperatorTok{$}\NormalTok{Test)}
+\end{Highlighting}
+\end{Shaded}
+
+\#plot a bar graph of Standard deviation of the Error by Test
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(perceptiondf, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{fct_reorder}\NormalTok{(Test, }\KeywordTok{desc}\NormalTok{(sd)), }\DataTypeTok{y =}\NormalTok{ sd)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_col}\NormalTok{(}\DataTypeTok{colour=}\StringTok{"black"}\NormalTok{) }\OperatorTok{+}\StringTok{  }
+\StringTok{  }\KeywordTok{expand_limits}\NormalTok{(}\DataTypeTok{y=}\DecValTok{0}\NormalTok{) }\OperatorTok{+}\StringTok{ }\CommentTok{# Make the y-axis go to zero. }
+\StringTok{  }\KeywordTok{theme_grey}\NormalTok{(}\DataTypeTok{base_size =} \DecValTok{14}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold.italic"}\NormalTok{, }
+                                   \DataTypeTok{size=}\DecValTok{10}\NormalTok{, }
+                                   \DataTypeTok{angle=}\DecValTok{90}\NormalTok{),}
+        
+        \DataTypeTok{axis.text.y =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold.italic"}\NormalTok{, }
+                                   \CommentTok{#color="#993333"}
+\NormalTok{                                   ), }
+        \DataTypeTok{panel.grid.major.x =} \KeywordTok{element_blank}\NormalTok{(), }\CommentTok{# Hide the vertical grid lines }
+        \DataTypeTok{panel.grid.minor.x =} \KeywordTok{element_blank}\NormalTok{(),}
+        
+        \DataTypeTok{panel.grid.major.y =} \KeywordTok{element_blank}\NormalTok{(), }\CommentTok{# Hide the horizontal grid lines}
+        \DataTypeTok{panel.grid.minor.y =} \KeywordTok{element_blank}\NormalTok{(), }
+        \DataTypeTok{legend.position =} \StringTok{"none"}
+\NormalTok{        ) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{y  =} \StringTok{"Standard deviation of Error"}\NormalTok{, }\DataTypeTok{x =} \StringTok{"Test"}\NormalTok{, }\DataTypeTok{title =} \StringTok{"Standard deviation of Error}\CharTok{\textbackslash{}n}\StringTok{by Test"}\NormalTok{)    }
+\NormalTok{p <-}\StringTok{ }\NormalTok{p }\OperatorTok{+}\StringTok{  }\KeywordTok{coord_flip}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_y_continuous}\NormalTok{(}\DataTypeTok{breaks =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.00}\NormalTok{, }\FloatTok{0.05}\NormalTok{, }\FloatTok{0.10}\NormalTok{, }\FloatTok{0.15}\NormalTok{, }\FloatTok{2.0}\NormalTok{))}
+\NormalTok{p}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-27-1.pdf}
+
+\hypertarget{a-bar-graph-of-the-absolute-error-by-test}{%
+\section{a bar graph of the Absolute Error by
+Test}\label{a-bar-graph-of-the-absolute-error-by-test}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse) }
+\NormalTok{perceptionExperiment <-}\StringTok{ }\NormalTok{perceptionExperiment }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Test =} \KeywordTok{as.factor}\NormalTok{(Test)) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{results =} \KeywordTok{fct_reorder}\NormalTok{(Test, absoluteError)) }\CommentTok{# ordering the data}
+
+\NormalTok{p <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(perceptionExperiment, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{fct_reorder}\NormalTok{(Test, absoluteError), }\DataTypeTok{y =}\NormalTok{ absoluteError)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_col}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{expand_limits}\NormalTok{(}\DataTypeTok{y=}\DecValTok{0}\NormalTok{) }\OperatorTok{+}\StringTok{ }\CommentTok{# Make the y-axis go to zero. }
+\StringTok{  }\KeywordTok{theme_grey}\NormalTok{(}\DataTypeTok{base_size =} \DecValTok{14}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold.italic"}\NormalTok{, }
+                                   \DataTypeTok{size=}\DecValTok{10}\NormalTok{, }
+                                   \DataTypeTok{angle=}\DecValTok{90}\NormalTok{),}
+        
+        \DataTypeTok{axis.text.y =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold.italic"}\NormalTok{, }
+\NormalTok{                                   ), }
+        \DataTypeTok{panel.grid.major.x =} \KeywordTok{element_blank}\NormalTok{(), }\CommentTok{# Hide the vertical grid lines }
+        \DataTypeTok{panel.grid.minor.x =} \KeywordTok{element_blank}\NormalTok{(),}
+        
+        \DataTypeTok{panel.grid.major.y =} \KeywordTok{element_blank}\NormalTok{(), }\CommentTok{# Hide the horizontal grid lines}
+        \DataTypeTok{panel.grid.minor.y =} \KeywordTok{element_blank}\NormalTok{(), }
+        \DataTypeTok{legend.position =} \StringTok{"none"}
+\NormalTok{        ) }
+\NormalTok{p <-}\StringTok{ }\NormalTok{p }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"Test"}\NormalTok{, }\DataTypeTok{title =} \StringTok{"Absolute Error Vs Test"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"Absolute Error"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{coord_flip}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_y_continuous}\NormalTok{(}\DataTypeTok{breaks =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{25}\NormalTok{, }\DecValTok{50}\NormalTok{, }\DecValTok{75}\NormalTok{, }\DecValTok{100}\NormalTok{))}
+\NormalTok{p}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-28-1.pdf}
+
+\#Question number 3
+\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#
+
+\#Load the Infant data set.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{infantdata <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\DataTypeTok{file =} \StringTok{"../HomeWork1/datasets/InfantData.csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{","}\NormalTok{ , }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+\#find an missing variables
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{sum}\NormalTok{(}\KeywordTok{is.na}\NormalTok{(infantdata))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\#Convert sex to a factor
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{infantdatads <-}\StringTok{ }\NormalTok{infantdata }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{transmute}\NormalTok{(}\DataTypeTok{Sex =}\NormalTok{ Sex, }
+            \DataTypeTok{HeightIn =}\NormalTok{ HeightIn, }
+            \DataTypeTok{WeightLbs =}\NormalTok{ WeightLbs}
+\NormalTok{  ) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Sex =} \KeywordTok{as.factor}\NormalTok{(Sex), }
+         \DataTypeTok{color =} \KeywordTok{as.factor}\NormalTok{(}\KeywordTok{case_when}\NormalTok{(Sex }\OperatorTok{==}\StringTok{ "M"} \OperatorTok{~}\StringTok{ "#a6cee3"}\NormalTok{, }
+\NormalTok{                                     Sex }\OperatorTok{==}\StringTok{ "F"}  \OperatorTok{~}\StringTok{  "#b2df8a"}\NormalTok{)}
+\NormalTok{                           )}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{scatter-plot-of-weightlbs-vs-heightin}{%
+\section{Scatter plot of Weightlbs Vs
+HeightIn}\label{scatter-plot-of-weightlbs-vs-heightin}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{colr  <-}\StringTok{ }\KeywordTok{as.character}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"green"}\NormalTok{)}
+\NormalTok{p <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(infantdatads, }
+       \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ HeightIn, }
+           \DataTypeTok{y =}\NormalTok{ WeightLbs}
+\NormalTok{           , }\DataTypeTok{shape =}\NormalTok{ Sex}
+\NormalTok{           )}
+\NormalTok{       ) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{color=}\NormalTok{infantdatads}\OperatorTok{$}\NormalTok{color) }\OperatorTok{+}\StringTok{ }\CommentTok{# set the size of the points to 1.5}
+\StringTok{  }
+\StringTok{  }\KeywordTok{theme_grey}\NormalTok{(}\DataTypeTok{base_size =} \DecValTok{14}\NormalTok{)}\CommentTok{# +  scale_fill_manual(values = c("#a6cee3", "#1f78b4"))}
+\NormalTok{p <-}\StringTok{ }\NormalTok{p }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold.italic"}\NormalTok{, }
+                                   
+                                   \DataTypeTok{size=}\DecValTok{10}
+\NormalTok{                                   ), }
+        \DataTypeTok{axis.text.y =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold.italic"}\NormalTok{, }
+                                   \CommentTok{#color="#993333", }
+                                   \DataTypeTok{size=}\DecValTok{10}
+\NormalTok{                                   ),}
+        \DataTypeTok{panel.grid.major.x =} \KeywordTok{element_blank}\NormalTok{(), }\CommentTok{# Hide the vertical grid lines}
+        \DataTypeTok{panel.grid.minor.x =} \KeywordTok{element_blank}\NormalTok{(),}
+
+        \DataTypeTok{panel.grid.major.y =} \KeywordTok{element_blank}\NormalTok{(), }\CommentTok{# Hide the horizontal grid lines}
+        \DataTypeTok{panel.grid.minor.y =} \KeywordTok{element_blank}\NormalTok{(),}
+        \DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust =} \FloatTok{0.5}\NormalTok{,}
+                                    \DataTypeTok{size =} \DecValTok{14}\NormalTok{,}
+                                    \DataTypeTok{face =} \StringTok{"bold.italic"}
+\NormalTok{          )}
+\NormalTok{        )  }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"Scatter plot of Weight in Lbs Vs Height in inches"}\NormalTok{, }\DataTypeTok{x =} \StringTok{"Height in inches"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"Weight in Lbs"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_color_manual}\NormalTok{(}\DataTypeTok{values =} \KeywordTok{levels}\NormalTok{(infantdatads}\OperatorTok{$}\NormalTok{color))}
+\NormalTok{p <-}\StringTok{ }\NormalTok{p }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_x_continuous}\NormalTok{(}\DataTypeTok{breaks =} \KeywordTok{seq}\NormalTok{(}\FloatTok{15.0}\NormalTok{, }\FloatTok{25.0}\NormalTok{, }\DataTypeTok{by =} \FloatTok{2.5}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{()}
+\NormalTok{p}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-32-1.pdf}
+
+\hypertarget{scatter-plot-of-weightlbs-vs-heightin-1}{%
+\section{Scatter plot of Weightlbs Vs
+HeightIn}\label{scatter-plot-of-weightlbs-vs-heightin-1}}
+
+\hypertarget{adding-separate-single-trend-lines}{%
+\section{Adding separate single trend
+lines}\label{adding-separate-single-trend-lines}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(infantdatads, }
+       \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ HeightIn, }
+           \DataTypeTok{y =}\NormalTok{ WeightLbs}
+\NormalTok{           , }\DataTypeTok{colour =}\NormalTok{ Sex}
+\NormalTok{           , }\DataTypeTok{shape =}\NormalTok{ Sex}
+\NormalTok{           )}
+\NormalTok{       ) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }\CommentTok{# set the size of the points to 1.5}
+\StringTok{  }\KeywordTok{stat_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"Scatter plot of Weight in lbs Vs Height in inches}\CharTok{\textbackslash{}n}\StringTok{with separate trend lines"}\NormalTok{, }\DataTypeTok{x =} \StringTok{"Height in inches"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"Weight in Lbs"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{theme_grey}\NormalTok{(}\DataTypeTok{base_size =} \DecValTok{14}\NormalTok{) }
+\NormalTok{p <-}\StringTok{ }\NormalTok{p }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold.italic"}\NormalTok{, }
+                                   
+                                   \DataTypeTok{size=}\DecValTok{10}
+\NormalTok{                                   ), }
+        \DataTypeTok{axis.text.y =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{face=}\StringTok{"bold.italic"}\NormalTok{, }
+                                   
+                                   \DataTypeTok{size=}\DecValTok{10}
+\NormalTok{                                   ),}
+        \DataTypeTok{panel.grid.major.x =} \KeywordTok{element_blank}\NormalTok{(), }\CommentTok{# Hide the vertical grid lines}
+        \DataTypeTok{panel.grid.minor.x =} \KeywordTok{element_blank}\NormalTok{(),}
+
+        \DataTypeTok{panel.grid.major.y =} \KeywordTok{element_blank}\NormalTok{(), }\CommentTok{# Hide the horizontal grid lines}
+        \DataTypeTok{panel.grid.minor.y =} \KeywordTok{element_blank}\NormalTok{(),}
+\NormalTok{        )  }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{()}
+\NormalTok{p}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula 'y ~ x'
+\end{verbatim}
+
+\includegraphics{rSyntaxHomeWorkOneAssignment_files/figure-latex/unnamed-chunk-33-1.pdf}
+
+\end{document}

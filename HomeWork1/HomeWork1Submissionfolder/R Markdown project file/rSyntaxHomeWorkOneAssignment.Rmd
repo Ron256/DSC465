@@ -1,0 +1,456 @@
+---
+title: "DSC 465 HomeWork1 Assignment"
+author: "Ronaldlee Ejalu"
+date: "4/1/2021"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+
+#load the necessary packages
+```{r}
+#library(plyr) # for data wrangling
+library(dplyr)     # for data wrangling
+library(lubridate) # for dealing with dates
+library(ggplot2)   # for dealing with visualization
+```
+
+#set the working directory
+```{r}
+setwd("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork1")
+```
+
+#Load the Intel Stock data set
+```{r}
+intelstock <- read.csv(file = "../HomeWork1/datasets/Intel-1998.csv", sep = "," , header = TRUE )
+```
+
+#view the first 6 records of the data set
+```{r}
+head(intelstock)
+```
+
+#Find any missing values
+```{r}
+sum(is.na(intelstock))
+```
+
+#derive weekday
+```{r}
+intelstockds <- intelstock %>% 
+  select(date = Date, 
+         trainingday = Trading.Day, 
+         open = Open, 
+         high = High, 
+         low = Low, 
+         close = Close, 
+         volume = Volume, 
+         adjclose = Adj.Close, date1 = Date,
+         ) %>%
+  transmute(date = mdy(date), 
+            date1 = date1,
+            trainingday = trainingday, 
+            open=open, 
+            high=high, 
+            low=low, 
+            close=close, 
+            volume=volume, 
+            adjclose=adjclose,
+            range = (high - low)
+            ) %>%
+  mutate(wday = wday(date, label = TRUE, abbr = TRUE), date1 = as.Date(date)
+                                          
+         )
+```
+
+
+# An ordinary line graph of closing price vs date
+```{r}
+ggplot(data = intelstockds, aes(x = date, y = close)) + 
+  geom_line(size = 1.5, alpha = .6, position = position_dodge(0.2)) + 
+  ylim(0, max(intelstockds$close)) + # have the y range start from zero. 
+  annotate("text", 
+           x = mean(range(intelstockds$date)), 
+           y = Inf, 
+           label = "closing price vs date", 
+           vjust = 1.5, 
+           size = 4.5, 
+           colour = "red"
+           )
+```
+
+
+#Bar graph of Volume Vs the exact Date
+```{r}
+#specify breaks as a Date vector
+datebreaks <- seq(as.Date("1998-01-01"), as.Date("1999-01-01"), by = "1 month")
+p <- ggplot(intelstockds, aes(x = date, y = volume)) + 
+  geom_col(width = 0.5, position = "dodge") + 
+  ggtitle("Volume vs date")
+
+p <- p + scale_x_date(breaks = datebreaks) + 
+  scale_y_continuous(labels = scales::comma) + # format the y axis and include , in the volume values
+  theme(axis.text.x = element_text(face="bold", 
+                                          color="#993333"
+                                          #,  size=14
+                                          , angle=90)
+               , axis.text.y = element_text(face="bold",
+                                             color="#993333"
+                                            #, size=14
+                                            , angle=45)
+               ) 
+
+p  
+```
+
+# normalize the volume 
+```{r}
+library(scales)
+intelstockds <- intelstockds %>%
+  mutate(norm.volume = scale(volume))
+```
+
+# structure of intelstockds
+```{r}
+str(intelstockds)
+```
+
+# summary statistics of norm.volume
+```{r}
+summary(intelstockds$norm.volume)
+```
+
+
+# determine the bin width
+# using the formula 2 * IQR/cube root of n
+```{r}
+# Q3 = 0.3017  
+# Q1 = -0.5989
+# IQR = Q3 - Q1
+# bin width  = 2 * IQR/cube root of n
+```
+
+# number of observations 
+```{r}
+dim(intelstockds)
+```
+Filt
+
+
+#Creating a histogram of the daily stock Volume
+```{r}
+ggplot(intelstockds, aes(x=volume)) + 
+  geom_histogram(bins = 20) + 
+  ggtitle("Histogram of daily stock volume") +
+  scale_x_continuous(labels = scales::comma)
+```
+
+
+
+# Remove entries with the means greater than 150086000
+```{r}
+intelstockds.sortedf  <- intelstockds %>% filter(volume <= 151875200)
+```
+
+
+#Repeat or corrections for 1C
+```{r}
+ggplot(intelstockds.sortedf, aes(x=log(volume))) + 
+  geom_histogram(bins = (log2(252)) + 1) + 
+  expand_limits(y=0) + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   
+                                   size=10
+                                   ), 
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=10
+                                    )
+        ,
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+         
+        )  + labs(x = "natural log of volume", title = "Histogram of daily stock volume")
+```
+
+
+
+# Scatter plot that graphs the Volume on the x-axis and
+# the daily price on the y-axis. 
+```{r}
+ggplot(intelstockds, aes(x = volume, y = range)) + 
+  geom_point(size = 1.5) + # using the size aesthetic to control the size of the points.
+  ggtitle("Scatter plot of daily price range vs Volume ") + 
+  scale_x_continuous(labels = scales::comma) 
+```
+
+###########################################################################################################################################
+#Question 2
+###########################################################################################################################################
+
+#Load the data set
+```{r}
+perceptionExperiment <- read.csv(file = "../HomeWork1/datasets/PerceptionExperiment1.csv", sep = "," , header = TRUE )
+```
+
+#View the first 6 rows
+```{r}
+head(perceptionExperiment)
+```
+
+#derive a new column that contains the amount of error. 
+```{r}
+perceptionExperiment <- perceptionExperiment %>%
+  mutate(error = Response - TrueValue, 
+         absoluteError = abs(Response - TrueValue), Test = as.factor(Test)
+         )
+```
+
+#a histogram of the overall distribution of Error
+```{r}
+ggplot(perceptionExperiment, aes(x=error)) + 
+  geom_histogram(bins = 20) + 
+  ggtitle("Histogram of the overall distribution error") #+
+  #scale_x_continuous(labels = scales::comma)
+```
+
+# To be discussed in class. 
+# a bar graph of the median Error by Test
+```{r}
+library(tidyverse)
+ggplot(perceptionExperiment, aes(x = fct_reorder(Test, error), y = error)) + 
+  geom_col() + 
+  theme(axis.text.x = element_text(face="bold", 
+                                          color="#993333"
+                                          ,  size=10
+                                          , angle=90
+                                   ), 
+        axis.text.y = element_text(face="bold", 
+                                   color="#993333"
+                                   )
+  ) + 
+  labs(title = "A bar graph of median error by Test", x = "Test") + 
+  coord_flip()
+```
+
+#Repeat of 2b
+# a bar graph of the median Error by Test
+
+```{r}
+library(tidyverse)
+p <- ggplot(perceptionExperiment, aes(x=fct_reorder(Test, desc(error)), y=error, fill=Test))
+p <- p + stat_summary(fun.y="median", geom="bar") + theme_grey(base_size = 14)
+p <- p +  theme(axis.text.x = element_text(face="bold" 
+                                           ,  size=10
+                                           , angle=90
+                                   ),
+        axis.text.y = element_text(face="bold"
+                                   ),
+        panel.grid.major.x = element_blank(), # Hide the vertical grid lines 
+        panel.grid.minor.x = element_blank(),
+        
+        panel.grid.major.y = element_blank(), # Hide the horizontal grid lines
+        panel.grid.minor.y = element_blank(), 
+        
+        # Change the background color (fill) and border (colour)
+        # and border thickness (size)of the legend box
+        # We control the title text color, font size and font face
+        
+        legend.background = element_rect(fill = "white", colour = "grey", size = 1), 
+        legend.title = element_text(colour = "blue", face = "bold", size = 14),
+        legend.text = element_text(colour = "black"), 
+        legend.key = element_rect(colour = "black", size = 0.1)
+  ) + 
+  labs(title = "A bar graph of median error by Test", x = "Test")
+p <- p + scale_fill_discrete(limits = c("Slope", "Volume", "Area",  # controlling the order of the legend
+                                   "Veritcal Distance, Aligned", 
+                                   "Vertical Distance, Non-Aligned", 
+                                   "Angle", "Length, Non-Aligned", "Color Value")) 
+p + scale_y_continuous(breaks = c(0.1, 0, -0.1)) + theme_bw()  + coord_flip()
+
+```
+
+#get variables of interest to derive the standard deviation
+```{r}
+perceptionExperimentsdErrorbyTestdf <- perceptionExperiment %>%
+  select(Test = Test, 
+         #TestNumber = TestNumber,  
+         error = error
+         )
+```
+
+#Function to calculate the mean and the standard deviation for each group
+```{r}
+data_summary <- function(data, varname, groupnames){
+  require(plyr)
+  summary_func <- function(x, col){
+    c(mean = mean(x[[col]], na.rm=TRUE),
+      sd = sd(x[[col]], na.rm=TRUE))
+  }
+  data_sum<-ddply(data, groupnames, .fun=summary_func,
+                  varname)
+  data_sum <- rename(data_sum, c("mean" = varname))
+ return(data_sum)
+}
+```
+
+#Summarize the data set
+```{r}
+perceptiondf <- data_summary(perceptionExperimentsdErrorbyTestdf, 
+                             varname = "error", 
+                             groupnames = c("Test")
+                             )
+perceptiondf$Test <- as.factor(perceptiondf$Test)
+```
+
+#plot a bar graph of Standard deviation of the Error by Test
+```{r}
+p <- ggplot(perceptiondf, aes(x = fct_reorder(Test, desc(sd)), y = sd)) + 
+  geom_col(colour="black") +  
+  expand_limits(y=0) + # Make the y-axis go to zero. 
+  theme_grey(base_size = 14) +
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=10, 
+                                   angle=90),
+        
+        axis.text.y = element_text(face="bold.italic", 
+                                   #color="#993333"
+                                   ), 
+        panel.grid.major.x = element_blank(), # Hide the vertical grid lines 
+        panel.grid.minor.x = element_blank(),
+        
+        panel.grid.major.y = element_blank(), # Hide the horizontal grid lines
+        panel.grid.minor.y = element_blank(), 
+        legend.position = "none"
+        ) + 
+  labs(y  = "Standard deviation of Error", x = "Test", title = "Standard deviation of Error\nby Test")    
+p <- p +  coord_flip() + scale_y_continuous(breaks = c(0.00, 0.05, 0.10, 0.15, 2.0))
+p
+```
+
+# a bar graph of the Absolute Error by Test
+```{r}
+library(tidyverse) 
+perceptionExperiment <- perceptionExperiment %>% mutate(Test = as.factor(Test)) %>% mutate(results = fct_reorder(Test, absoluteError)) # ordering the data
+
+p <- ggplot(perceptionExperiment, aes(x = fct_reorder(Test, absoluteError), y = absoluteError)) + 
+  geom_col() + 
+  expand_limits(y=0) + # Make the y-axis go to zero. 
+  theme_grey(base_size = 14) +
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=10, 
+                                   angle=90),
+        
+        axis.text.y = element_text(face="bold.italic", 
+                                   ), 
+        panel.grid.major.x = element_blank(), # Hide the vertical grid lines 
+        panel.grid.minor.x = element_blank(),
+        
+        panel.grid.major.y = element_blank(), # Hide the horizontal grid lines
+        panel.grid.minor.y = element_blank(), 
+        legend.position = "none"
+        ) 
+p <- p + 
+  labs(x = "Test", title = "Absolute Error Vs Test", y = "Absolute Error") +
+  coord_flip() + scale_y_continuous(breaks = c(0, 25, 50, 75, 100))
+p
+```
+
+#####################################################################################################################################################################
+#Question number 3
+#####################################################################################################################################################################
+
+#Load the Infant data set.
+```{r}
+infantdata <- read.csv(file = "../HomeWork1/datasets/InfantData.csv", sep = "," , header = TRUE )
+```
+
+#find an missing variables
+```{r}
+sum(is.na(infantdata))
+```
+
+#Convert sex to a factor
+```{r}
+infantdatads <- infantdata %>%
+  transmute(Sex = Sex, 
+            HeightIn = HeightIn, 
+            WeightLbs = WeightLbs
+  ) %>%
+  mutate(Sex = as.factor(Sex), 
+         color = as.factor(case_when(Sex == "M" ~ "#a6cee3", 
+                                     Sex == "F"  ~  "#b2df8a")
+                           )
+  )
+```
+
+
+# Scatter plot of Weightlbs Vs HeightIn
+```{r}
+colr  <- as.character("blue", "green")
+p <- ggplot(infantdatads, 
+       aes(x = HeightIn, 
+           y = WeightLbs
+           , shape = Sex
+           )
+       ) + 
+  geom_point(color=infantdatads$color) + # set the size of the points to 1.5
+  
+  theme_grey(base_size = 14)# +  scale_fill_manual(values = c("#a6cee3", "#1f78b4"))
+p <- p + theme(axis.text.x = element_text(face="bold.italic", 
+                                   
+                                   size=10
+                                   ), 
+        axis.text.y = element_text(face="bold.italic", 
+                                   #color="#993333", 
+                                   size=10
+                                   ),
+        panel.grid.major.x = element_blank(), # Hide the vertical grid lines
+        panel.grid.minor.x = element_blank(),
+
+        panel.grid.major.y = element_blank(), # Hide the horizontal grid lines
+        panel.grid.minor.y = element_blank(),
+        plot.title = element_text(hjust = 0.5,
+                                    size = 14,
+                                    face = "bold.italic"
+          )
+        )  + labs(title = "Scatter plot of Weight in Lbs Vs Height in inches", x = "Height in inches", y = "Weight in Lbs") + scale_color_manual(values = levels(infantdatads$color))
+p <- p + scale_x_continuous(breaks = seq(15.0, 25.0, by = 2.5)) + theme_bw()
+p
+```
+
+
+# Scatter plot of Weightlbs Vs HeightIn
+# Adding separate single trend lines
+```{r}
+p <- ggplot(infantdatads, 
+       aes(x = HeightIn, 
+           y = WeightLbs
+           , colour = Sex
+           , shape = Sex
+           )
+       ) + 
+  geom_point() + # set the size of the points to 1.5
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Scatter plot of Weight in lbs Vs Height in inches\nwith separate trend lines", x = "Height in inches", y = "Weight in Lbs") + 
+  theme_grey(base_size = 14) 
+p <- p + theme(axis.text.x = element_text(face="bold.italic", 
+                                   
+                                   size=10
+                                   ), 
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=10
+                                   ),
+        panel.grid.major.x = element_blank(), # Hide the vertical grid lines
+        panel.grid.minor.x = element_blank(),
+
+        panel.grid.major.y = element_blank(), # Hide the horizontal grid lines
+        panel.grid.minor.y = element_blank(),
+        )  + theme_bw()
+p
+```
