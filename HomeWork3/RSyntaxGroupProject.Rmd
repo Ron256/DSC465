@@ -1,0 +1,451 @@
+---
+title: "Group Project"
+author: "Ronaldlee Ejalu"
+date: "5/11/2021"
+output:
+  word_document: default
+  html_document: default
+---
+
+# Load the necessary libraries
+```{r}
+library(tidyverse)
+library(dplyr)
+
+
+library(ggplot2)
+library(RColorBrewer)
+library(scales) 
+library(gifski)
+library(gganimate)
+```
+
+# Set a working directory
+```{r}
+setwd("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork3")
+```
+
+# load the data set
+```{r}
+Flightsds <- read.csv(file = "../HomeWork3/datasets/2016.csv", sep = "," , header = TRUE )
+```
+
+# View the first 10 ten records
+```{r}
+head(Flightsds)
+```
+
+# determine any missing values
+```{r}
+sum(is.na(Flightsds))
+```
+
+# structure of the data set
+```{r}
+str(Flightsds)
+```
+
+# lets select a sample of 100000 rows
+```{r}
+flight.sampleds <- Flightsds[sample(nrow(Flightsds), 100000), ]
+```
+
+# cleaning the data
+```{r}
+Flightsds$Unnamed..27 <- NULL 
+flight.sampleds.nona <-  na.omit(Flightsds)
+flight.sampleds.nona <- flight.sampleds.nona %>% 
+  mutate(month = format(as.Date(FL_DATE), 
+                        "%B") %>% as.factor(), 
+         Carrier = as.factor(OP_CARRIER)
+      ) 
+```
+
+
+# graph a scatter plot
+```{r}
+# deltaFlights <- flight.sampleds %>% filter(OP_CARRIER == "DL")
+
+splot <- ggplot(Flightsds, aes(x=(DEP_DELAY/100), y = (ARR_DELAY/100))) +
+  geom_point(alpha = 0.2, na.rm = TRUE) +
+  #geom_jitter(width = 30, height=30, na.rm = TRUE) +
+  theme(axis.text.x = element_text(face="bold.italic",
+                                   size=12),
+        axis.text.y = element_text(face="bold.italic",
+
+                                   size=12
+                                    ),
+        plot.title = element_text(hjust = 0.5,
+                                  size = 14,
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) +
+  labs(title = " A scatter plot of Arrival Delay Vs Departure Delay for all carriers", x = "Departure Delay\n(in hundreds)", y = "Arrival Delay\n (in hundreds)") + facet_wrap(~ as.factor(OP_CARRIER))
+splot
+```
+# There is a positive relationship between dep_delay and arr_delay
+# As dep_delays increases, arrive delays tend to increase. 
+
+#qa
+```{r}
+#library(lubridate)
+Flightsds$month <- format(as.Date(Flightsds$FL_DATE), "%B")
+```
+
+
+# Number of flights of each airline in 2016
+```{r}
+
+flightsCounts <- Flightsds %>%
+  mutate(dayofweek = weekdays(as.Date(FL_DATE))) %>%
+  mutate(dayofweek = case_when(dayofweek == "Monday" ~ "Mon",
+                               dayofweek == "Tuesday" ~ "Tue",
+                               dayofweek == "Wednesday" ~ "Wed",
+                               dayofweek == "Thursday" ~ "Thur",
+                               dayofweek == "Friday" ~ "Fri",
+                               dayofweek == "Saturday" ~ "Sat",
+                               dayofweek == "Sunday" ~ "Sun"
+                               )
+         ) %>%
+  group_by(OP_CARRIER,month, dayofweek) %>% # group the number of flights by carrier
+  dplyr::summarize(numofflights = n(), .groups = "drop") %>%
+  mutate(Carrier = factor(OP_CARRIER), month = as.factor(month)) %>%
+  mutate(dayofweek = factor(dayofweek, 
+                            levels = c("Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun")
+                            )
+         )
+```
+
+# Number of flights of each airline in 2016 with vertical axis scale modified
+```{r}
+library(plotly)
+# flightsCounts <- Flightsds %>%
+#   mutate(dayofweek = weekdays(as.Date(FL_DATE))) %>%
+#   mutate(dayofweek = case_when(dayofweek == "Monday" ~ "Mon",
+#                                dayofweek == "Tuesday" ~ "Tue",
+#                                dayofweek == "Wednesday" ~ "Wed",
+#                                dayofweek == "Thursday" ~ "Thur",
+#                                dayofweek == "Friday" ~ "Fri",
+#                                dayofweek == "Saturday" ~ "Sat",
+#                                dayofweek == "Sunday" ~ "Sun")) %>%
+#   group_by(OP_CARRIER,month, dayofweek) %>% # group the number of flights by carrier
+#   summarize(numofflights = n(), .groups = "drop") %>%
+#   mutate(Carrier = as.factor(OP_CARRIER), month = as.factor(month)) %>%
+#   mutate(dayofweek = factor(dayofweek, levels = c("Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun")))
+
+bplot <- flightsCounts %>% filter(month== "January" & Carrier == "WN") %>% ggplot( aes(x=fct_reorder(dayofweek,
+                                                 (numofflights/1000000)#,
+                                                 #.desc = TRUE
+                                                 ),
+                                   y = (numofflights/1000000), text = paste('</br>Day of Week : ', dayofweek, '</br>Number of Flights: ', (numofflights/1000000)
+
+                ))) +
+  geom_col() +
+  expand_limits(y=0) +
+  theme(axis.text.x = element_text(face="bold.italic",
+                                   size=12),
+        axis.text.y = element_text(face="bold.italic",
+
+                                   size=12
+                                    ),
+        plot.title = element_text(hjust = 0.5,
+                                  size = 14,
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) +
+  labs(title = "January 2016 Daily Number of Flights for SouthWest Airlines", x = "Day of the Week", y = "Number of Flights\n (in Millions)") +
+  #scale_y_continuous(labels = scales::comma, breaks = c(0, 0.25, 0.5, 0.75, 1.0)) +
+  theme_bw()
+
+fig <- ggplotly(bplot, tooltip = c("text"))
+fig
+```
+
+# subselect all the Delay variables
+```{r}
+flightsdelay <- flight.sampleds %>%
+  select(DEP_DELAY, ARR_DELAY, CARRIER_DELAY, WEATHER_DELAY, NAS_DELAY, SECURITY_DELAY, LATE_AIRCRAFT_DELAY)
+```
+
+# Scatter plot matrix for all the delay variables
+```{r}
+# library(GGally)
+# ggpairs(flightsdelay, cardinality_threshold = 211,  na="naDiag", lower=list(continuous='points'),
+#     axisLabels='none',
+#     upper=list(continuous='blank'))
+```
+
+# Univariate Scatter plot
+```{r}
+#Flightsds$Unnamed..27 <- NULL 
+#flight.sampleds.nona <-  na.omit(Flightsds)
+
+bplot <-  flight.sampleds.nona %>% 
+  filter(month == "January") %>% 
+  ggplot(aes(x = Carrier,
+                                     y = CARRIER_DELAY
+                                     )
+                ) +
+  geom_point(alpha = 0.5) +
+  #stat_summary(fun.y = "mean", geom = "point", shape = 23, size = 3 , fill = "white") +
+  theme(axis.text.x = element_text(face="bold.italic",
+                                   size=12),
+        axis.text.y = element_text(face="bold.italic",
+
+                                   size=12
+                                    ),
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5,
+                                  size = 14,
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) +
+    labs(title = "Univariate Scatterplot showing Carrier Delay vs the Carriers", x = "Carriers", y = "Carrier Delay") + 
+  theme_bw()
+
+
+bplot
+```
+
+# create new variables
+# flightStatus and statusdescr
+```{r}
+flight.withnewVariables <- Flightsds %>% 
+  mutate(flightStatus = case_when(ARR_DELAY < 15 & ARR_DELAY > 0  ~ 0, 
+                                  ARR_DELAY >= 15 & ARR_DELAY > 60 ~ 1, 
+                                  ARR_DELAY >= 60 ~ 2, 
+                                  DIVERTED == 1 ~ 3, 
+                                  CANCELLED == 1 ~ 4
+                                  )
+  ) %>%
+  mutate(Status = as.factor(case_when(flightStatus == 0 ~ 'On time', 
+                                      flightStatus == 1 ~ 'Slighty delayed', 
+                                      flightStatus == 2 ~ 'highly delayed', 
+                                      flightStatus == 3 ~ 'diverted', 
+                                      flightStatus == 4 ~ 'cancelled'
+                                      )
+                            ), 
+         month = format(as.Date(FL_DATE), 
+                        "%B") %>% as.factor(), 
+  ) %>%
+  mutate(dayofweek = weekdays(as.Date(FL_DATE))) %>% 
+  mutate(dayofweek = case_when(dayofweek == "Monday" ~ "Mon", 
+                               dayofweek == "Tuesday" ~ "Tue", 
+                               dayofweek == "Wednesday" ~ "Wed", 
+                               dayofweek == "Thursday" ~ "Thur", 
+                               dayofweek == "Friday" ~ "Fri", 
+                               dayofweek == "Saturday" ~ "Sat", 
+                               dayofweek == "Sunday" ~ "Sun")  , 
+         Carrier = as.factor(OP_CARRIER)
+         ) %>%
+  mutate(dayofweek = factor(dayofweek, levels = c("Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun")))
+```
+
+# Number of flights per status.
+```{r}
+cnt.agg.flighstatus <- flight.withnewVariables %>%
+  group_by(Status,  month, dayofweek, Carrier) %>%
+  dplyr::summarize(numflights = n(),.groups = "drop")
+
+# any missing values
+cnt.agg.flighstatus <- na.omit(cnt.agg.flighstatus)
+
+cnt.agg.flighstatus <- cnt.agg.flighstatus %>% 
+  mutate(numflights=sort(numflights, decreasing = TRUE)) # Order by num of flights in descreasing order
+```
+
+# Graph the flight status using the bar plot
+```{r}
+bplot <- cnt.agg.flighstatus %>% 
+  filter(month == "January" & Carrier == "WN") %>% 
+  ggplot(aes(x=fct_reorder(dayofweek, 
+                                                 (numflights/1000)#, .desc = TRUE
+                                                 ), 
+                                   y = (numflights/1000), fill = Status
+                                   )
+                ) +
+  geom_col(position = "dodge", colour = "black") + 
+  expand_limits(y=0) + scale_fill_manual(values = c("#a6cee3", "#1f78b4","#b2df8a","#fbb4ae", "#d95f02")) + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+  labs(title = "January 2016 Daily Carrier Number of Flights per Status for SouthWest Airlines", x = "Day of Week", y = "Number of Flights \n in thousands") + 
+  #coord_flip() + 
+  scale_fill_discrete(limits = c("cancelled", "diverted", "highly delayed", "On time", "Slightly delayed")) +
+  theme_bw() 
+
+bplot
+```
+
+# Cancelled flights
+# filter by flightStatus equal to 4
+```{r}
+CancelledFlights <- 
+  flight.withnewVariables %>% 
+  filter(flightStatus == 4) %>%
+  mutate(month = format(as.Date(FL_DATE), "%B") %>% 
+           as.factor()
+         )
+```
+
+# determine the number of cancelled flights per CancellationCode
+```{r}
+CancelledFlights.agg <- CancelledFlights %>% 
+  group_by(CANCELLATION_CODE, month, dayofweek, Carrier) %>% 
+  dplyr::summarize(num.flights = n(), .groups = "drop") %>%
+
+  mutate(Reason = as.factor(case_when(CANCELLATION_CODE == 'A' ~ 'Carrier', 
+                                      CANCELLATION_CODE == 'B' ~ 'Weather', 
+                                      CANCELLATION_CODE == 'C' ~ 'National Air System', 
+                                      CANCELLATION_CODE == 'D' ~ 'Security'
+                                      )
+                            )
+         ) %>% # derive the cancellation reason 
+  mutate(num.flights = sort(num.flights, decreasing = TRUE)
+          ) %>% # Order by num of flights
+  mutate(CANCELLATION_CODE = as.factor(CANCELLATION_CODE)) #%>%
+```
+
+
+# derive the box for Cancellation
+```{r}
+#CancelledFlights.agg <- CancelledFlights.agg %>% mutate(Reason = factor(Reason, levels=c("Carrier", "Weather", "National Air System", "Security")))
+
+bplot <- CancelledFlights.agg %>%
+  filter(month == "January" & Carrier == "WN") %>%
+  mutate(Reason = factor(Reason, levels=c("Carrier", "Weather", "National Air System", "Security"))) %>%
+  
+  ggplot(aes(x=fct_reorder(dayofweek, 
+                           (num.flights/1000)
+                           ), 
+             y = (num.flights/1000), fill = Reason
+             )
+         ) +
+  geom_col(position = "dodge", colour = "black") + 
+  expand_limits(y=0) + 
+  scale_fill_manual(values = c("#a6cee3", "#1f78b4","#b2df8a","#fbb4ae", "#d95f02"
+                               )
+                    ) + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+        ),  
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+        ) # format the title
+  ) + 
+  labs(title = "January 2016 Daily Carrier Cancelled Flights per Cancellation Reason for Southwest Airlines", x = "Day of the Week", y = "Number of Cancelled Flights \n in thousands")  + 
+  scale_fill_discrete(limits=c("Carrier", "Weather", "National Air System", "Security")) + # controlling the order of the legend
+  # coord_flip() + 
+  theme_bw()
+
+bplot
+```
+
+# 'ArrDelay', 'CarrierDelay', 'LateAircraftDelay', 'NASDelay', 'WeatherDelay'
+
+```{r}
+str(Flightsds)
+```
+
+
+# Pivot the data
+flight
+```{r}
+Flightsds.pivot <- na.omit(Flightsds) %>% # Pivot the data
+  pivot_longer(c("ARR_DELAY", "CARRIER_DELAY", "WEATHER_DELAY", "NAS_DELAY", "LATE_AIRCRAFT_DELAY"), names_to = "OtherDelays", values_to = "Values") %>% 
+  mutate(OtherDelays = as.factor(OtherDelays), month = format(as.Date(FL_DATE), "%B") %>% as.factor())
+```
+
+# derive the boxplot showing the different distributions
+```{r}
+bplot <- Flightsds.pivot %>% 
+  filter(month=="January") %>% 
+  ggplot(aes(x = OtherDelays, y = Values)) + 
+  geom_boxplot() + # stat_summary(fun.y = "mean", geom = "point", shape = 23, size = 3 , fill = "white") +
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+    labs(title = "Box plots comparing the distributions of Arrival, Carrier, Weather, NAS and late aircraft delays aganist their values.")  + theme_bw() + coord_flip()
+
+# bplot <- bplot + geom_jitter()
+
+bplot
+
+```
+
+# structure of flightdelay
+```{r}
+str(flight.sampleds)
+```
+
+# subset the data
+```{r}
+flights1 <- Flightsds %>% 
+  select(ARR_DELAY, DEP_DELAY, FL_DATE, OP_CARRIER) %>% 
+  mutate(FL_DATE = as.Date(FL_DATE), 
+         OP_CARRIER = as.factor(OP_CARRIER), 
+         FlightMonth = format(FL_DATE, "%m") %>% as.integer(), 
+         month = format(as.Date(FL_DATE), "%B") %>% as.factor(), 
+         day = format(as.Date(FL_DATE), "%d") %>% as.integer()) %>%
+  group_by(ARR_DELAY, DEP_DELAY, FL_DATE, OP_CARRIER, FlightMonth, month, day) %>%
+  dplyr::summarize(noOfFlights = n(), .groups = "drop")
+```
+
+# graph the animated scattter splot
+```{r}
+# deltaFlights <- flight.sampleds %>% filter(OP_CARRIER == "DL")
+
+splot <- flights1 %>% 
+  filter(month == "May") %>% 
+  ggplot(aes(x=(DEP_DELAY/100), y = (ARR_DELAY/100), size = noOfFlights, colour = OP_CARRIER)) + 
+  geom_point(show.legend = FALSE, alpha = 0.7) + 
+    scale_color_viridis_d() +
+  scale_size(range = c(2, 12)) + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic",  
+                                   
+                                   size=12
+                                    ),  
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+  labs(title = " A scatter plot of Arrival Delay Vs Departure Delay for all carriers", x = "Departure Delay\n(in hundreds)", y = "Arrival Delay\n (in hundreds)") 
+splot
+```
+# add on a layer
+```{r}
+splot <- splot + transition_time(day) +
+  labs(title = "Flight day: {frame_time}") 
+splot
+```
+
+
+
+
+

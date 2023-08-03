@@ -1,0 +1,861 @@
+---
+title: "RsyntaxDSC465HomeWork3"
+author: "Ronaldlee Ejalu"
+date: "5/6/2021"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+# Package Installation scripts
+```{r}
+# library(rlang)
+# sessionInfo()
+
+#remove.packages("dplyr")
+# options("install.lock"=FALSE)
+# install.packages("dplyr", dependencies = TRUE, INSTALL_opts = '--no-lock')
+```
+
+
+# load the necessary packages
+```{r}
+library(dplyr)
+library(tidyverse)
+
+library(ggplot2)
+library(RColorBrewer)
+```
+
+
+# Set a working directory
+```{r}
+setwd("C:/Users/rejalu1/OneDrive - Henry Ford Health System/DSC 465/HomeWork/HomeWork3")
+```
+
+# load the data set
+```{r}
+PerceptionExp <- read.csv(file = "../HomeWork3/datasets/PerceptionExperiment.csv", sep = "," , header = TRUE )
+```
+
+# number of observation of the data set
+```{r}
+dim(PerceptionExp)
+```
+
+# structure of the data set
+```{r}
+str(PerceptionExp)
+```
+
+# determine any missing values
+```{r}
+sum(is.na(PerceptionExp))
+```
+
+# Understanding the data
+```{r}
+#library(dplyr)
+PerceptionExp %>% filter(Trial == "B") %>% select(Test, TestNumber, Subject)
+```
+
+# doing more exploratory analysis
+```{r}
+PerceptionExp %>% select(Test) %>% unique()
+```
+
+# doing more exploratory analysis
+# with groupings
+```{r}
+PerceptionExp <- PerceptionExp %>% 
+  group_by(Test, Display, TestNumber) %>%
+  arrange(TestNumber, .by_group = TRUE)
+```
+
+# Create a new column that contains amount of Error
+```{r}
+PerceptionExp <- PerceptionExp %>% mutate(Error = Response - TrueValue, absoluteError = abs(Response - TrueValue), Test = as.factor(Test)) %>%
+  mutate(estimateIndicator = case_when(Error == 0.0 ~ " Equal", 
+                                       Error < 0.00 ~ "Underestimated", 
+                                       Error > 0 ~ "Overestimated")
+         )
+```
+
+##############################################################################################################
+# 1 a grouped bar chart
+#################################################################################################################
+
+# using a grouped bar chart
+```{r}
+Perception.agg <- PerceptionExp %>%
+  dplyr::group_by(Test, estimateIndicator) %>% # group the data by Test and EstimatedIndicator
+  summarise(countoferror = n(), .groups = 'drop') %>% # find the count of error
+  mutate(EstimateIndicator = as.factor(estimateIndicator))
+
+barplot <- ggplot(Perception.agg, aes(x = reorder(factor(Test), countoferror), y = countoferror, fill = EstimateIndicator )) +
+  geom_col(position = "dodge", colour = "black") +  # use the position parameter to create the grouped bar charts
+  
+  # This is for color blind people
+  scale_fill_manual(values = c("#a6cee3", "#1f78b4","#b2df8a")) #+ scale_fill_brewer(palette = "Pastel1")
+
+
+barplot <- barplot + theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=10, 
+                                   angle=10),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=10
+                                    ),  
+        panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + labs(title = "A bar graph showing the comparison of equal, overestimated and underestimated responses over the different Test", 
+                 x = "Test")
+
+barplot
+```
+
+
+# Univariate scatter plot
+```{r}
+peplot <- PerceptionExp %>% ggplot(aes(x = fct_reorder(Test, absoluteError), y = absoluteError, colour = Test)) + 
+  geom_point(size = 1.5) + scale_color_brewer(palette = "Dark2")
+
+peplot <- peplot + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=10, 
+                                   angle=10),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=10
+                                    ),  
+        panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ),  # format the title
+        
+        legend.background = element_rect(fill = "white", colour = "grey", size = 1), 
+        legend.title = element_text(face = "bold", size = 14),
+        legend.text = element_text(colour = "black"), 
+        legend.key = element_rect(colour = "black", size = 0.1)
+        ) + 
+  labs(title = "Univariate scatter plot showing Absolute Error for each Test method", x = "Test") + 
+  theme_minimal() + coord_flip()
+
+peplot
+```
+
+
+############################################################################################################################
+#Part C
+#############################################################################################################################
+
+# Filter the data
+```{r}
+PerceptionExp56to73 <- PerceptionExp %>% filter(Subject >= 56 & Subject <= 73) %>% mutate(Display = as.character(Display) %>% as.factor())
+```
+
+
+# qa
+```{r}
+Perception.agg <- PerceptionExp56to73 %>%
+  dplyr::group_by(Test, estimateIndicator, Display) %>% # group the data by Test and EstimatedIndicator
+  summarise(countoferror = n(), .groups = 'drop') %>% # find the count of error
+  mutate(EstimateIndicator = as.factor(estimateIndicator))
+
+barplot <- ggplot(Perception.agg, aes(x = reorder(factor(Test), countoferror), y = countoferror, fill = EstimateIndicator )) +
+  geom_col(position = "dodge", colour = "black") +  # use the position parameter to create the grouped bar charts
+  
+  # This is for color blind people
+  scale_fill_manual(values = c("#a6cee3", "#1f78b4","#b2df8a")) #+ scale_fill_brewer(palette = "Pastel1")
+
+
+barplot <- barplot + theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=10, 
+                                   angle=90),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=10
+                                    ),  
+        panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + labs(title = "A bar graph showing the comparison of equal, overestimated and underestimated responses over the different Test for Display 1 and 2", 
+                 x = "Test")
+
+barplot <- barplot + facet_wrap(~ Display)
+barplot
+```
+
+########################################################################################################################################
+# 1D
+########################################################################################################################################
+
+# Filter the data by Display and Test 
+# Also derive a column anomalousresponse which identifies outlier observation in our data set
+```{r}
+display1verticaldistancenonaligned <- PerceptionExp %>% 
+  filter(Display == "1" & Test == "Vertical Distance, Non-Aligned") %>% 
+  mutate(AnomalousResponse = case_when(Response < 1 ~ "False", 
+                                       Response == 1 ~ "True"
+                                       ) %>% as.factor() # after transforming, change it to a factor
+         )
+```
+
+# beeswarm plot
+```{r}
+library(ggbeeswarm)
+
+ggswarmPlot <- ggplot(display1verticaldistancenonaligned, aes(x = Response, y = Subject, fill = AnomalousResponse)) + 
+  geom_beeswarm(pch=21) + 
+  theme_minimal() + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=10),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=10
+                                    ),  
+        panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + labs(title = "A beeswarm plot visualizing the subset of Outliers for Vertical Distance, Non-aligned for Display 1") + scale_fill_manual(values = c("#1f78b4", "#b2df8a")) 
+ 
+ggswarmPlot
+```
+
+
+###############################################################################################################################################
+# Question 2. Astronomical data set
+#######################################################################################################################################
+
+# Load the data set
+```{r}
+MessierData <- read.csv(file = "../HomeWork3/datasets/MessierData.csv", sep = "," , header = TRUE )
+```
+
+# determine any missing values
+```{r}
+sum(is.na(MessierData))
+```
+
+# Remove the missing missing values
+```{r}
+MessierData <- na.omit(MessierData)
+```
+
+
+# Rename all columns
+```{r}
+MessierData <- MessierData %>%
+  rename(Messier = Messier.., 
+         NGC = NGC.., 
+         Kind = Kind, 
+         Type = Type, 
+         Distance.LY = Distance..LY., 
+         Size = Size....., 
+         RA.hm = R.A....h.m.., 
+         Dec = Dec.........)
+```
+
+# Let's normalize the Distance, Size, Apparent.Magnitude variables
+```{r}
+library(scales)
+MessierData <- MessierData %>% 
+  mutate(Size.n = rescale(Size, to=c(0,1)), 
+         Distance.LY.n = rescale(Distance.LY, to=c(0,1)), 
+         Magnitude.n = rescale(Apparent.Magnitude, to=c(0, 1))
+         )
+```
+
+# qa
+```{r}
+ggplot(MessierData, aes(x = Messier, y = Distance.LY + Size + Apparent.Magnitude)) + 
+  geom_line() + 
+  facet_wrap(~Distance.LY + Size + Apparent.Magnitude, scales = "free_y", ncol = 1)
+```
+
+####################################################################################################################################
+#How would you approach 2(a)
+# A scatter plot of one or more properties of the objects aganist the Messeir Number
+################################################################################################################################
+
+# Graph the Scatter plot of the log 10 of Distance aganist Messier Number
+```{r}
+splot <- ggplot(MessierData, aes(x = Messier, y = log(Distance.LY))) + 
+  geom_point(size = 1.5) + 
+  stat_smooth(method = lm, se = FALSE, colour = "black") + # se for disabling the CI, colour to change the regression line color 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + labs(title = "A Scatter plot of the Log 10 of Distance aganist the Messier Number", x = "Messier Number", y = "Log 10 of Distance.LY") 
+
+
+splot
+```
+
+# Graph the Scatter plot of Size aganist Messier Number
+```{r}
+splot <- ggplot(MessierData, aes(x = Messier, y = Size)) + 
+  geom_point(size = 1.5) + 
+  stat_smooth(method = lm, se = FALSE, colour = "black") + # se for disabling the CI, colour to change the regression line color 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+    labs(title = "A Scatter plot of Size aganist the Messier Number", x = "Messier Number", y = "Size") 
+
+splot
+```
+
+# Graph the Scatter plot of Apparent.Magnitude aganist Messier Number
+```{r}
+splot <- ggplot(MessierData, aes(x = Messier, y = Apparent.Magnitude)) + 
+  geom_point(size = 1.5) + 
+  stat_smooth(method = lm, se = FALSE, colour = "black") + # se for disabling the CI, colour to change the regression line color 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+    labs(title = "A Scatter plot of Apparent Magnitude aganist the Messier Number", x = "Messier Number", y = "Apparent Magnitude") 
+
+splot
+```
+
+
+
+
+
+################################################################################################################################################## 2(b)
+#################################################################################################################################
+
+
+
+# beeswarm plot
+```{r}
+library(ggbeeswarm)
+
+ggswarmPlot <- ggplot(MessierData, aes(x = fct_reorder(factor(Kind), log(Distance.LY)), y = log(Distance.LY))) + 
+  geom_beeswarm(size = 1.5, alpha = 0.8) + 
+  #expand_limits( y =0) +
+  # theme_minimal() + # remove the theme
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + labs(title = "A beeswarm of Kind vs Log10(Distance)", x = "Kind", y = "log10 of Distance.LY") 
+ 
+ggswarmPlot
+```
+
+
+#############################################################################################################################################
+#2(C) Scatter plot
+#############################################################################################################################################
+
+
+# Graph the Scatter plot of the original variables
+```{r}
+splot <- ggplot(MessierData, aes(x = log(Distance.LY), y = Apparent.Magnitude)) + 
+  geom_point(size = 1.5) + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + labs(title = "A Scatter plot of Log 10 of Distance aganist Apparent Magnitude", x = "Log 10 of Distance", y = "Apparent Magnitude") + scale_x_continuous(breaks = c(  7.5, 10, 12.5, 15))
+
+splot
+```
+
+####################################################################################################
+# 2(d)
+###################################################################################################
+
+
+# Graph the Scatter plot of the original variables
+```{r}
+splot <- ggplot(MessierData, aes(x = log(Distance.LY), y = Apparent.Magnitude)) + 
+  geom_point(size = MessierData$Size, color = "#636363", fill = "lightskyblue", alpha = 0.4, shape = 21, stroke = 1.5) + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + labs(title = "A Scatter plot of Log 10 of Distance aganist Apparent Magnitude based on the Angular Size", x = "Log 10 of Distance", y = "Apparent Magnitude") + scale_x_continuous(breaks = c(  7.5, 10, 12.5, 15))
+
+splot
+```
+
+############################################################################################################################################
+#3 Montana Population data set
+############################################################################################################
+
+# load the data set
+```{r}
+montanapopds <- read.csv(file = "../HomeWork3/datasets/MontanaPopulationData.csv", sep = "," , header = TRUE )
+```
+
+# determine the number of observations
+```{r}
+dim(montanapopds)
+```
+# top 6 rows of the data set
+```{r}
+head(montanapopds)
+```
+
+# determine any missing values
+```{r}
+sum(is.na(montanapopds))
+```
+
+# structure of the data set
+```{r}
+str(montanapopds)
+```
+
+###########################################################################################################
+#3 (a) Line graph
+########################################################################################################
+```{r}
+lineplot <- ggplot(montanapopds, aes(x = Year, y = log(Population))) +
+  geom_line() + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + labs(title = "Line graph of Log 10 of Population Vs Year", x = "Year", y = "Log 10(Population)") +
+  scale_x_continuous(breaks = c(1890,  1910,  1930, 1950,  1970,  1990,  2010))
+lineplot
+```
+#######################################################################################################################################
+# 3 (b)
+#######################################################################################################################################
+
+# transform the dataset and add the previous year population variable
+# and also derive the Percentage change of the population
+```{r}
+montanapopds <- montanapopds %>%
+  mutate(prevYearPopulation = lag(Population) - 1) %>%
+  mutate(perct.change.of.pop = round(((Population - prevYearPopulation)/prevYearPopulation) * 100 , 2))
+```
+
+# Line graph of Percentage Change of the Population Vs Year
+```{r}
+lineplot <- ggplot(montanapopds, aes(x = Year, y = perct.change.of.pop )) +
+  geom_line(na.rm = TRUE) + # exclude an missing rows by using na.rm = TRUE
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + labs(title = "Line graph of Percentage Change of the Population Vs Year", x = "Year", y = "% Change in Population") +
+  scale_x_continuous(breaks = c(1900,  1920, 1940,  1960,  1980,  2000)) + theme_minimal()
+lineplot
+```
+##############################################################################################################################################
+# 4 Air quality data set
+##############################################################################################################################################
+
+# Load the Air Quality data set
+```{r}
+airqualityds <- read.csv(file = "../HomeWork3/datasets/AirQuality.csv", sep = "," , header = TRUE )
+```
+# determine any missing values
+```{r}
+sum(is.na(airqualityds))
+```
+
+```{r}
+airqualityds <- na.omit(airqualityds)
+```
+
+
+# structure of the air quality ds
+```{r}
+str(airqualityds)
+```
+
+# graph the scatter plot
+```{r}
+aqplot <- ggplot(airqualityds, aes(x = Wind, y = Solar.R)) + 
+  geom_point(size = 1.3) + 
+  stat_smooth(method = lm, se = FALSE, colour = "black") + # se for disabling the CI, colour to change the regression line color 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+    labs(title = "A Scatter plot of Wind Vs Solar.R") 
+
+aqplot
+```
+###################################################################################################################################
+# 4(b) Boxplot that will show the distribution of Wind and Solar.R
+####################################################################################################################################
+
+# pivot the datavalues
+```{r}
+airqualitycds <- airqualityds  %>%
+  pivot_longer(c("Ozone", "Solar.R", "Wind", "Temp"), names_to = "Measurement", values_to = "Values") %>%
+  mutate(Measurement = as.factor(Measurement))
+```
+
+# filter airquality data set by the Measurement values of Solar.R and Wind
+```{r}
+airquality.Wind.Solar.R <- airqualitycds %>%  filter(Measurement == "Solar.R" | Measurement == "Wind")
+```
+
+# graph the box plot
+```{r}
+bplot <- ggplot(airquality.Wind.Solar.R, aes(x = Measurement, y = Values)) + 
+  geom_boxplot() + stat_summary(fun.y = "mean", geom = "point", shape = 23, size = 3 , fill = "white") +
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+    labs(title = "Box plots comparing the distributions of Solar.R and Wind") 
+
+# bplot <- bplot + geom_jitter()
+bplot
+```
+#########################################################################################################################################
+# 4(c) Box plots comparing the distributions of Ozone, Solar.R, Temp and Wind
+#########################################################################################################################################
+
+
+# graph the box plot
+```{r}
+bplot <- ggplot(airqualitycds, aes(x = Measurement, y = Values)) + 
+  geom_boxplot() + stat_summary(fun.y = "mean", geom = "point", shape = 23, size = 3 , fill = "white") +
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+    labs(title = "Box plots comparing the distributions of Solar.R and Wind") 
+
+
+bplot
+```
+
+#########################################################################################################################################
+# 4(d) Comparisson of Wind and Solar using the QQ plot
+##########################################################################################################################################
+
+# Sort the data set, airqualityds, 
+```{r}
+library(magrittr) # To access the dollar pipe, you need this library
+library(scales)
+sortedWindSolar <- airqualityds %$% # The dollar sign gives you access to the individual columns not 
+  data.frame(wind = sort(Wind), 
+             solar = sort(Solar.R)
+             )
+```
+
+# normalize the Wind and Solar variables
+```{r}
+sortedWindSolar <- sortedWindSolar %>%
+  mutate(windt = rescale(wind, to=c(0,1)
+                         ), 
+         solart = rescale(solar, to=c(0,1)
+                          )
+         )
+```
+
+
+# graph the qq plot
+```{r}
+xplot <- ggplot(sortedWindSolar, aes(x = windt, y = solart)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) +
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+    labs(title = "Q-Q comparing the distributions of Solar Vs Wind", x = "wind", y = "solar")
+xplot
+```
+
+#############################################################################################################################################
+# Question 5 Extra Credit
+############################################################################################################################################
+
+# Load the data set
+```{r}
+generalskillsurveyds <- read.csv(file = "../HomeWork3/datasets/General Skills Survey - Summary Report.csv", sep = "," , header = TRUE )
+```
+
+# get information about the data set
+```{r}
+str(generalskillsurveyds)
+```
+
+# clean up the variable names
+```{r}
+skills.surveyds <- generalskillsurveyds %>%
+  rename(section = Section.., 
+         question = Q.., 
+         QnType = Q.Type, 
+         QnTitle = Q.Title, 
+         Bonus = Bonus., 
+         Responses = X..Responses
+         )
+```
+
+# get information about the data set, skills.surveyds
+```{r}
+str(skills.surveyds)
+```
+
+# drop section, Bonus, Difficulty variables from the data since they have missing values.
+```{r}
+skills.surveyds <- skills.surveyds %>% 
+  select(-section, -Bonus, -Difficulty)
+```
+
+# determine if there is any missing values
+```{r}
+sum(is.na(skills.surveyds))
+```
+
+# students with no experience
+```{r}
+skills.noexp <- skills.surveyds %>% filter(Answer.Match == "N/A")
+```
+
+# Replace the null of values of QnTitle with string Visualization
+```{r}
+skills.surveyds <- skills.surveyds %>% mutate(QnTitle = replace(QnTitle, QnTitle == '', 'Visualization'))
+```
+
+
+# QnTitle with highest number of responses
+```{r}
+quest.num.responses <- skills.surveyds %>% 
+  group_by(QnTitle) %>% 
+  summarize(numresponses = sum(Responses)) %>%
+  mutate(numresponses = sort(numresponses , decreasing = TRUE)) %>% # Order the aggregated data set by numresponses
+  mutate(QnTitle = as.factor(QnTitle))
+```
+
+# bar graph of the number of responses vs QnTitle
+```{r}
+bplot <- ggplot(quest.num.responses, aes(x=fct_reorder(QnTitle, 
+                                                        numresponses, .desc = FALSE
+), 
+y = numresponses, fill = QnTitle
+)
+) +
+  geom_col(colour = "black") + 
+  expand_limits(y=0) + 
+  scale_fill_manual(values = c("#a6cee3", "#1f78b4","#b2df8a","#fbb4ae", "#d95f02"
+                               )
+                    ) + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+        ),  
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+        ) # format the title
+  ) + 
+  labs(title = "Number of Responses per Question Title", x = "QnTitle", y = "Number of Responses")  + 
+  scale_fill_discrete(limits=c("Commercial tool Importance", "Commercial Software Tool Experience", "Data sets of interest", "Programming Experience", "Visualization")) + # controlling the order of the legend. 
+  coord_flip() + theme_bw()
+
+bplot
+
+```
+
+# graph the box plot
+```{r}
+bplot <- ggplot(skills.surveyds, aes(x = as.factor(QnTitle), y = Responses)) + 
+  geom_boxplot() + stat_summary(fun.y = "mean", geom = "point", shape = 23, size = 3 , fill = "white") + expand_limits(y = 0) +
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+    labs(title = "Box plots comparing the distributions of the Question Titles", x = "Question Title")  + coord_flip() + theme_bw()
+
+
+bplot
+```
+
+# Univariate scatter plot
+```{r}
+bplot <- ggplot(skills.surveyds, aes(x = as.factor(QnTitle), y = Responses)) + 
+  geom_point() + 
+  theme(axis.text.x = element_text(face="bold.italic", 
+                                   size=12),  
+        axis.text.y = element_text(face="bold.italic", 
+                                   
+                                   size=12
+                                    ),  
+        # panel.grid.major.x = element_blank(), # Hide the horizontal grid lines
+        # panel.grid.minor.x = element_blank(),
+        plot.title = element_text(hjust = 0.5, 
+                                  size = 14, 
+                                  face = "bold.italic"
+                                  ) # format the title
+        ) + 
+    labs(title = "Univariate Scatter plot showing the distribution of Responses aganist the different Question Titles", x = "Question Title")  + coord_flip() + theme_bw()
+
+
+bplot
+```
+ # Bar graph visualizing the whose response was N/A
+```{r}
+skills.noexp.agg <- skills.noexp %>% 
+  mutate(QnTitle = as.factor(QnTitle)) %>%
+  group_by(QnTitle) %>% # group and find the sub totals
+  summarize(TotalResponses = sum(Responses))
+  
+bplot <- ggplot(skills.noexp.agg, aes(x=fct_reorder(QnTitle,
+                                                        TotalResponses, .desc = FALSE
+                                                       ),
+                                         y = TotalResponses, fill = QnTitle
+                                         )
+                ) +
+  geom_col(colour = "black") +
+  expand_limits(y=0) +
+  scale_fill_manual(#breaks = legend_ord,
+                    values = c("#a6cee3", "#1f78b4","#b2df8a"
+                               )
+                    ) +
+  theme(axis.text.x = element_text(face="bold.italic",
+                                   size=12),
+        axis.text.y = element_text(face="bold.italic",
+
+                                   size=12
+        ),
+        plot.title = element_text(hjust = 0.5,
+                                  size = 14,
+                                  face = "bold.italic"
+        ) # format the title
+  ) +
+  labs(title = "Number of Responses per Question Title where students answered N/A", x = "QnTitle", y = "Number of Responses")  +
+  coord_flip() + 
+  theme_bw()
+
+bplot
+```
+ 
